@@ -1,0 +1,82 @@
+<script>
+    layui.use(['element', 'form'], function () {
+        var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
+        var form = layui.form;
+        var $ = layui.$, layer = layui.layer;
+
+        $.ajax({
+            type: "GET",   //提交的方法
+            url: "/api/getAdvList", //提交的地址
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            // data: {'address_id':10},
+            // data: {'address_id':8},
+            data: { 'address_id': 9 },
+            async: false,
+            error: function (request) {  //失败的话
+                layer.msg('操作失败', { icon: 2, time: 2000 });
+            },
+            success: function (res) {  //成功
+                if (res.code == 200) {
+                    var width = res.info.width;
+                    $("#adv").css("width", res.info.width);
+                    $("#adv").css("height", 'auto');
+
+                    var data = res.list;
+                    var html = '';
+                    data.forEach(function (ele, index) {
+                        // console.log(ele);
+                        if (ele.is_carousel == 1)//轮播
+                        {
+                            var child = ele.child;
+                            // html = '<div class="imgBox" style="float:left;width:'+res.info.single_width+'">';
+                            child.forEach(function (ele1, index1) {
+                                if (index1 == 0) {
+                                    html = html +
+                                        '<div class="imgBox" style="float:left;width:' + res.info.single_width + '">' +
+                                        '<a href=' + ele1.href + '><img class="img-slide' + ele.id + ' img' + (index1 + 1) + '" src=' + ele1.url + ' alt=' + (index1 + 1) + '></a>'
+                                } else {
+                                    html = html +
+                                        '<a href=' + ele1.href + '><img style="display: none;" class="img-slide' + ele.id + ' img' + (index1 + 1) + '" src=' + ele1.url + ' alt=' + (index1 + 1) + '></a>'
+                                }
+                            });
+                            html = html + '</div>';
+
+                            setInterval(ChangeImg, ele.speed * 1000, ele.id);
+                        } else {
+                            var child = ele.child;
+                            child.forEach(function (ele1, index1) {
+                                html = html +
+                                    '<div style="width:' + res.info.single_width + ';height:auto;float:left;">' +
+                                    '<a href=' + ele1.href + '><img style="width:' + res.info.single_width + ';height:auto;" src=' + ele1.url + '></a></div>'
+                            });
+                        }
+
+                    });
+                    console.log(html);
+                    document.getElementById('adv').innerHTML = html;
+                }
+
+
+            }
+        });
+
+
+        var index = 0;
+        //改变图片
+        function ChangeImg(id) {
+            index++;
+            var a = document.getElementsByClassName("img-slide" + id);
+            // alert(a.length);
+            if (index >= a.length) index = 0;
+            for (var i = 0; i < a.length; i++) {
+                a[i].style.display = 'none';
+            }
+            console.log(index);
+            a[index].style.display = 'block';
+        }
+        // 设置定时器，
+
+
+
+    });
+</script>

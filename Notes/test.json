@@ -1,0 +1,115 @@
+{
+    "code": 200,
+    "list": [
+        {
+            "id": 109,
+            "pid": 0,
+            "title": "大赛新闻半通栏广告2",
+            "type_id": 4,
+            "address_id": 9,
+            "is_carousel": 1,
+            "speed": 3,
+            "url": null,
+            "href": null,
+            "state": 1,
+            "orderby": 30,
+            "created_at": "2021-08-03 11:22:40",
+            "updated_at": "2021-08-03 11:22:40",
+            "radio": null,
+            "child": [
+                {
+                    "id": 111,
+                    "pid": 109,
+                    "title": null,
+                    "type_id": null,
+                    "address_id": null,
+                    "is_carousel": 0,
+                    "speed": null,
+                    "url": "http://localhost:86/uploads/images/1627899636781451.png",
+                    "href": "http://www.sun-ada.net/",
+                    "state": 1,
+                    "orderby": 20,
+                    "created_at": null,
+                    "updated_at": null,
+                    "radio": null
+                },
+                {
+                    "id": 110,
+                    "pid": 109,
+                    "title": null,
+                    "type_id": null,
+                    "address_id": null,
+                    "is_carousel": 0,
+                    "speed": null,
+                    "url": "http://localhost:86/uploads/images/1627899610552160.jpg",
+                    "href": "http://www.sun-ada.net/",
+                    "state": 1,
+                    "orderby": 10,
+                    "created_at": null,
+                    "updated_at": null,
+                    "radio": null
+                }
+            ]
+        },
+        {
+            "id": 106,
+            "pid": 0,
+            "title": "大赛新闻半通栏广告1",
+            "type_id": 4,
+            "address_id": 9,
+            "is_carousel": 1,
+            "speed": 3,
+            "url": null,
+            "href": null,
+            "state": 1,
+            "orderby": 10,
+            "created_at": null,
+            "updated_at": null,
+            "radio": null,
+            "child": [
+                {
+                    "id": 108,
+                    "pid": 106,
+                    "title": null,
+                    "type_id": null,
+                    "address_id": null,
+                    "is_carousel": 0,
+                    "speed": null,
+                    "url": "http://localhost:86/uploads/images/1627899538936881.jpg",
+                    "href": "http://www.sun-ada.net/",
+                    "state": 1,
+                    "orderby": 20,
+                    "created_at": null,
+                    "updated_at": null,
+                    "radio": null
+                },
+                {
+                    "id": 107,
+                    "pid": 106,
+                    "title": null,
+                    "type_id": null,
+                    "address_id": null,
+                    "is_carousel": 0,
+                    "speed": null,
+                    "url": "http://localhost:86/uploads/images/1627899516387879.png",
+                    "href": "http://www.sun-ada.net/",
+                    "state": 1,
+                    "orderby": 10,
+                    "created_at": null,
+                    "updated_at": null,
+                    "radio": null
+                }
+            ]
+        }
+    ],
+    "info": {
+        "id": 9,
+        "title": "大赛新闻半通栏广告",
+        "width": "1200px",
+        "single_width": "600px",
+        "state": 1,
+        "orderby": 30,
+        "created_at": "2021-08-02 18:16:58",
+        "updated_at": "2021-08-02 18:16:58"
+    }
+}

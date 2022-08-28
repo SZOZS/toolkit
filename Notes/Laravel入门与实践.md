@@ -727,7 +727,111 @@
     创建通知的命令如下。
     php artisan make:notification WorkoutAvailable
     示例15-10显示了这个命令的返回情况。
-###### 示例15-10 一个自动shne
+###### 示例15-10 一个自动生成的通知类
+```
+    <?php
+    namespace App\Notifications;
+    
+    use Illuminate\Bus\Queueable;
+    use Illuminate\Notifications\Notification;
+    use Illuminate\Contracts\Queue\ShouldQueue;
+    use Illuminate\Notifications\Messages\MailMessage;
 
-
-<!-- .log,.lock,.json,.js,.xml,.txt,.scss,.md,.stub,.blade.php,.css,.gitignore -->
+    class WorkoutAvailable extends Notification
+    {
+        use Queueable;
+        /**
+         * 创建一个新的通知实例
+         *
+         * @return void
+         */
+         public function __construct()
+         {
+            //  
+         }
+        // 获取通知的交付通道
+        public function via($notifiable)
+        {
+            return ["mail"];
+        }
+        // 获取通知的邮件表示
+        public function toMail($notifiable)
+        {
+            return (new MailMessage)
+                ->line("The introduction to the notification.")
+                ->action("Notification Action","https://laravel.com")
+                ->line("Thank you for using our application!");
+        }
+        // 获取通知的数组表示形式
+        public function toArray($notifiable)
+        {
+            return [];
+        }
+    }
+```
+    我们可以从以上的代码中学到一些知识。首先，要把相关数据传递到构造函数。其次，对于给定的用户，可以通过via()方法来定义应该使用哪一个通知频道($notifiable代表我们想要通知的系统中的实体，在大多数应用中，它表示一个用户，但并不总是)。最后，每个通知频道都有各自的方法，允许我们专门定义如何在该频道中发送通知。
+##### 什么时候$notification不表示一个用户
+    虽然最常见的通知目标是用户，但我们仍有可能通知其他实体。因为应用程序中有多个用户类型————因此，我们还可能想要通知“培训者”和“学员”，甚至可能想要通知某个“群组”，某个“公司”，或者某个“服务器”。
+    若要实现上述目标，需要修改类的WorkoutAvailable示例。请参考示例15-11。
+###### 示例15-11 WorkoutAvailable通知类
+```
+    class WorkoutAvailable extends Notification
+    {
+        use Queueable;
+        public $workout;
+        public function __construct($workout)
+        {
+            $this->workout=$workout;
+        }
+        public function via($notifiable)
+        {
+            // 这个方法目前在用户端不存在，我们正在努力实现这个功能
+            return $notifiable->preferredNotificationChannels();
+        }
+        public function toMail($notifiable)
+        {
+            return (new MailMessage)
+                ->line("You have a new workout available!")
+                ->action("Check it out new",route("workout",[$this->workout]))
+                ->line("Thank you for training with us!");
+        }
+        public function toArray($notifiable)
+        {
+            return [];
+        }
+    }
+```
+#### 为通知对象定义via()方法
+    如示例15-11所示，我们要决定对于不同的通知以及通知对象，到底应该采用哪个通知频道。可以把所有的通知都当做邮件来发送，也可以把它们当做SMS来发送（见示例15-12）。
+###### 示例15-12最简单可行的via()方法
+    public function via($notifiable)
+    {
+        return "nexmo";
+    }
+    也可以让每一个用户选择一种偏好方法，并将其保存在User内部。
+###### 示例15-13 每个用户自定义via()方法
+    public function via($notifiable)
+    {
+        return $notifiable->preferred_notification_channel;
+    }
+    或者，参照示例15-11，为每一个通知对象创建一个允许复杂通知逻辑的方法。例如，可以在工作时间内利用某些频道通知用户，而在非工作时间采用别的频道。需要注意的是，via()是一个PHP类,因此我们可以通过它实现任何复杂逻辑。
+#### 发送通知
+    有两种发送通知的方式：使用Notification facade,或在一个Eloquent类（类似于User类）中添加Notifiable特性。
+##### 使用Notifiable trait发送通知
+    任何导入Laravel\Notifications\Notifiable trait(默认情况下是App\User类)的模型都具有一个可传递通知的notify()方法，如示例15-14所示。
+###### 示例 15-14 使用Notifiable trait 发送通知
+```
+    use App\Notifications\WorkoutAvailable;
+    ...
+    $user->notify(new WorkoutAvailable($workout));
+```
+##### 使用Notification facade 发送通知
+    Notification facade 发送通知是两种方法中较为“笨拙”的一种，因为我们要同时传递通知对象和通知，好处在于可以同时传递多个通知对象，如示例15-15所示。
+###### 示例15-15 使用Notification facade 发送通知
+```
+    use App\Notifications\WorkoutAvailable;
+    ...
+    Notification::send($users,new WorkoutAvailable($workout));
+``` 
+#### 排队通知
+    大多数通知驱动程序需要发送HTTP请求从而发送通知

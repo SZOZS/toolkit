@@ -414,7 +414,7 @@ public function index(){
 // return response()->json(User::all());
 
 // response()->download()和->file()
-return response()->download('file501751.pdf', 'myFile.pdf');
+// return response()->download('file501751.pdf', 'myFile.pdf');
 
 // // 编写一个简单的POST路由测试
 // public function test_post_creates_new_assignment(){
@@ -2265,28 +2265,28 @@ return response()->download('file501751.pdf', 'myFile.pdf');
 // });
 
 
-Route::get('route', function () {
-    return new Illuminate\Http\Response('Hello!');
-});
-Route::get('route', function () {
-    return response('Hello!');
-});
-// 包含自定义状态和表头的简单HTTP响应
-Route::get('route', function () {
-    return response('Error!', 400)
-        ->header('X-Header-Name', 'header-value')
-        ->cookie('cookie-name', 'cookie-value');
-});
-// 为响应添加cookie
-return response($content)
-    ->cookie('signup_dismissed', true);
-// shiyong view()响应类型
-Route::get('/', function (XmlGetterService $xml) {
-    $data = $xml->get();
-    return response()
-        ->view('xml-structure', $data)
-        ->header('Content-Type', 'text/xml');
-});
+// Route::get('route', function () {
+//     return new Illuminate\Http\Response('Hello!');
+// });
+// Route::get('route', function () {
+//     return response('Hello!');
+// });
+// // 包含自定义状态和表头的简单HTTP响应
+// Route::get('route', function () {
+//     return response('Error!', 400)
+//         ->header('X-Header-Name', 'header-value')
+//         ->cookie('cookie-name', 'cookie-value');
+// });
+// // 为响应添加cookie
+// return response($content)
+//     ->cookie('signup_dismissed', true);
+// // shiyong view()响应类型
+// Route::get('/', function (XmlGetterService $xml) {
+//     $data = $xml->get();
+//     return response()
+//         ->view('xml-structure', $data)
+//         ->header('Content-Type', 'text/xml');
+// });
 // 使用download()响应类型
 // public function export(){
 //     return response()
@@ -2312,74 +2312,74 @@ Route::get('/', function (XmlGetterService $xml) {
 //     return response()->json(['Tom','Jerry']);
 // }
 // 使用redirect()全局助手示例
-return redirect('account/payment');
-return redirect()->to('account/payment');
-return redirect()->route('account.payment');
-return redirect()->action('AccountController@showPayment');
-return redirect()->route('contact.edit', ['id' => 15]);
-return redirect()->action('ContactsController@edit', ['id' => 15]);
+// return redirect('account/payment');
+// return redirect()->to('account/payment');
+// return redirect()->route('account.payment');
+// return redirect()->action('AccountController@showPayment');
+// return redirect()->route('contact.edit', ['id' => 15]);
+// return redirect()->action('ContactsController@edit', ['id' => 15]);
 // 通过输入往回重定向
 // public function store(){
 //     return back()->withInput();
 // }
 // 根据暂存数据重定向
-Route::post('contacts', function () {
-    return redirect('dashboard')->with('message', 'Contact created!');
-});
-Route::get('dashboard', function () {
-    echo session('message');
-});
-// 创建自定义响应宏
-class AppServiceProvider
-{
-    public function boot()
-    {
-        Response::macro('myJson', function ($content) {
-            return response(json_encode($content))
-                ->headers(['ContentType' => 'application/json']);
-        });
-    }
-}
-return response()->myJson(['name' => 'Sangeetha']);
+// Route::post('contacts', function () {
+//     return redirect('dashboard')->with('message', 'Contact created!');
+// });
+// Route::get('dashboard', function () {
+//     echo session('message');
+// });
+// // 创建自定义响应宏
+// class AppServiceProvider
+// {
+//     public function boot()
+//     {
+//         Response::macro('myJson', function ($content) {
+//             return response(json_encode($content))
+//                 ->headers(['ContentType' => 'application/json']);
+//         });
+//     }
+// }
+// return response()->myJson(['name' => 'Sangeetha']);
 /**
  * php artisan make::middleware BanDeleteMethod
  */
-class BanDeleteMethod
-{
-    public function handle($request, Closure $next)
-    {
-        return $next($request);
-    }
-}
+// class BanDeleteMethod
+// {
+//     public function handle($request, Closure $next)
+//     {
+//         return $next($request);
+//     }
+// }
 // 中间件调用过程伪代码
-class BanDeleteMethod
-{
-    public function handle($request, Closure $next)
-    {
-        if ($request->ip() == '192.168.1.1') {
-            return response('BANNED IP ADDRESS!', 403);
-        }
-        $response = $next($request);
-        $response->cookie('visited-our-site', true);
-        return $response;
-    }
-}
+// class BanDeleteMethod
+// {
+//     public function handle($request, Closure $next)
+//     {
+//         if ($request->ip() == '192.168.1.1') {
+//             return response('BANNED IP ADDRESS!', 403);
+//         }
+//         $response = $next($request);
+//         $response->cookie('visited-our-site', true);
+//         return $response;
+//     }
+// }
 // 中间件禁止delete方法
-class BanDeleteMethod
-{
-    public function handle($request, Closure $next)
-    {
-        if ($request->method() === 'DELETE') {
-            return response(
-                "Get out of here with that delete method",
-                405
-            );
-        }
-        $response = $next($request);
-        $response->cookie('visited-out-site', true);
-        return $response;
-    }
-}
+// class BanDeleteMethod
+// {
+//     public function handle($request, Closure $next)
+//     {
+//         if ($request->method() === 'DELETE') {
+//             return response(
+//                 "Get out of here with that delete method",
+//                 405
+//             );
+//         }
+//         $response = $next($request);
+//         $response->cookie('visited-out-site', true);
+//         return $response;
+//     }
+// }
 // 绑定全局中间件
 // Protected $middleware=[
 //     \Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::class,
@@ -2391,13 +2391,13 @@ class BanDeleteMethod
 //     'nodelete'=>\App\Http\Middleware\BanDeleteMethod::class,
 // ];
 // 在路由定义中使用路由中间件
-Route::get('contacts', [
-    'middleware' => 'nodelete',
-    'uses' => 'ContactsController@index'
-]);
-Route::group(['prefix' => 'api', 'middleware' => 'nodelete', function () {
-}]);
-Route::get('/', 'HomeController@index')->middleware('web');
+// Route::get('contacts', [
+//     'middleware' => 'nodelete',
+//     'uses' => 'ContactsController@index'
+// ]);
+// Route::group(['prefix' => 'api', 'middleware' => 'nodelete', function () {
+// }]);
+// Route::get('/', 'HomeController@index')->middleware('web');
 // Laravel5.3中默认的路由服务提供者
 // public function map(){
 //     $this->mapApiRoutes();
@@ -2421,132 +2421,132 @@ Route::get('/', 'HomeController@index')->middleware('web');
 //     });
 // }
 // 向中间件传参
-Route::get('company', function () {
-    return view('company.admin');
-})->middleware('auth::owner');
+// Route::get('company', function () {
+//     return view('company.admin');
+// })->middleware('auth::owner');
 // public function handle($request,$next,$role){
 //     if(auth()->check() && auth()->user()->hasRole($role)){
 //         return $next($request);
 //     }
 //     return redirect('login');
 // }
-Route::get('company', function () {
-    return view('company.admin');
-})->middleware('auth::owner,view');
-$request = new Illuminate\Http\Request(
-    $query,
-    $request,
-    $attributes,
-    $cookies,
-    $files,
-    $server,
-    $content
-);
-$response = new Illuminate\Http\Response(
-    $content,
-    $status,
-    $headers
-);
+// Route::get('company', function () {
+//     return view('company.admin');
+// })->middleware('auth::owner,view');
+// $request = new Illuminate\Http\Request(
+//     $query,
+//     $request,
+//     $attributes,
+//     $cookies,
+//     $files,
+//     $server,
+//     $content
+// );
+// $response = new Illuminate\Http\Response(
+//     $content,
+//     $status,
+//     $headers
+// );
 // 基本的依赖注入
-class UserMailer
-{
-    protected $mailer;
+// class UserMailer
+// {
+//     protected $mailer;
 
-    public function __construct(Mailer $mailer)
-    {
-        $this->mailer = $mailer;
-    }
-    public function welcome($user)
-    {
-        return $this->mailer->mail($user->email, 'Welcome!');
-    }
-}
+//     public function __construct(Mailer $mailer)
+//     {
+//         $this->mailer = $mailer;
+//     }
+//     public function welcome($user)
+//     {
+//         return $this->mailer->mail($user->email, 'Welcome!');
+//     }
+// }
 
-$mailer = new MailgunMailer($mailgunKey, $mailgunSecret, $mailgunOptions);
-$userMailer = new UserMailer($mailer);
-$userMailer->welcome($user);
+// $mailer = new MailgunMailer($mailgunKey, $mailgunSecret, $mailgunOptions);
+// $userMailer = new UserMailer($mailer);
+// $userMailer->welcome($user);
 // 更复杂的手动依赖注入
-$mailer = new MailgunMailer($mailgunKey, $mailgunSecret, $mailgunOptions);
-$logger = new Logger($logPath, $minimumLogLevel);
-$slack = new Slack($slackKey, $slackSecret, $channelName, $channelIcon);
-$userMailer = new UserMailer($mailer, $logger, $slack);
-$userMailer->welcome($user);
-$logger = app(Logger::class);
+// $mailer = new MailgunMailer($mailgunKey, $mailgunSecret, $mailgunOptions);
+// $logger = new Logger($logPath, $minimumLogLevel);
+// $slack = new Slack($slackKey, $slackSecret, $channelName, $channelIcon);
+// $userMailer = new UserMailer($mailer, $logger, $slack);
+// $userMailer->welcome($user);
+// $logger = app(Logger::class);
 // Laravel自动装配
-class Bar
-{
-    public function __construct()
-    {
-    }
-}
-class Baz
-{
-    public function __construct()
-    {
-    }
-}
-class Foo
-{
-    public function __construct(Bar $bar, Baz $baz)
-    {
-    }
-}
-$foo = app(Foo::class);
+// class Bar
+// {
+//     public function __construct()
+//     {
+//     }
+// }
+// class Baz
+// {
+//     public function __construct()
+//     {
+//     }
+// }
+// class Foo
+// {
+//     public function __construct(Bar $bar, Baz $baz)
+//     {
+//     }
+// }
+// $foo = app(Foo::class);
 // public function __construct(Logger $logger){
 // }
 // 基本容器绑定
-class test
-{
-    public function register()
-    {
-        $this->app->bind(Logger::class, function ($app) {
-            return new Logger('\log\path\here', 'error');
-        });
-    }
-    // 绑定单例模式、别名和实例
-    public function register2()
-    {
-        $this->app->singleton(Logger::class, function () {
-            return new Logger('\log\path\here', 'error');
-        });
-    }
-    public function register3()
-    {
-        $logger = new Logger('\log\path\here', 'error');
-        $this->app->instance(Logger::class, $logger);
-    }
-    // 语境绑定
-    public function register4()
-    {
-        $this->app->when(FileWrangler::class)
-            ->needs(Interfaces\Logger::class)
-            ->give(Loggers\Syslog::class);
-        $this->app->when(Jpbs\SendWelcomeEmail::class)
-            ->needs(Interfaces\Logger::class)
-            ->give(Loggers\PaperTrail::class);
-    }
-}
-$this->app->bind(UserMailer::class, function ($app) {
-    return new UserController(
-        $app->make(Mailer::class),
-        $app->make(Logger::class),
-        $app->make(Slack::class)
-    );
-});
-$this->bind(Logger::class, FirstLogger::class);
-$this->bind('log', FirstLogger::class);
-$this->bind(FirstLogger::class, 'log');
+// class test
+// {
+//     public function register()
+//     {
+//         $this->app->bind(Logger::class, function ($app) {
+//             return new Logger('\log\path\here', 'error');
+//         });
+//     }
+//     // 绑定单例模式、别名和实例
+//     public function register2()
+//     {
+//         $this->app->singleton(Logger::class, function () {
+//             return new Logger('\log\path\here', 'error');
+//         });
+//     }
+//     public function register3()
+//     {
+//         $logger = new Logger('\log\path\here', 'error');
+//         $this->app->instance(Logger::class, $logger);
+//     }
+//     // 语境绑定
+//     public function register4()
+//     {
+//         $this->app->when(FileWrangler::class)
+//             ->needs(Interfaces\Logger::class)
+//             ->give(Loggers\Syslog::class);
+//         $this->app->when(Jpbs\SendWelcomeEmail::class)
+//             ->needs(Interfaces\Logger::class)
+//             ->give(Loggers\PaperTrail::class);
+//     }
+// }
+// $this->app->bind(UserMailer::class, function ($app) {
+//     return new UserController(
+//         $app->make(Mailer::class),
+//         $app->make(Logger::class),
+//         $app->make(Slack::class)
+//     );
+// });
+// $this->bind(Logger::class, FirstLogger::class);
+// $this->bind('log', FirstLogger::class);
+// $this->bind(FirstLogger::class, 'log');
 // 指定并绑定到接口
-use Interfaces\Mailer;
+// use Interfaces\Mailer;
 
-class UserMailer
-{
-    protected $mailer;
-    public function __construct(Mailer $mailer)
-    {
-        $this->mailer = $mailer;
-    }
-}
+// class UserMailer
+// {
+//     protected $mailer;
+//     public function __construct(Mailer $mailer)
+//     {
+//         $this->mailer = $mailer;
+//     }
+// }
 
 // public function register(){
 //     $this->app->bind(\Interfaces\Mailer::class,function(){
@@ -2555,54 +2555,54 @@ class UserMailer
 // }
 
 // 将依赖关系注入控制器
-class MyController extends Controller
-{
-    protected $logger;
-    public function __construct(Logger $logger)
-    {
-        $this->logger = $logger;
-    }
-    public function index()
-    {
-        $this->logger->error('Something happened');
-    }
-}
+// class MyController extends Controller
+// {
+//     protected $logger;
+//     public function __construct(Logger $logger)
+//     {
+//         $this->logger = $logger;
+//     }
+//     public function index()
+//     {
+//         $this->logger->error('Something happened');
+//     }
+// }
 
 
 // 方法注入
 // 将依赖关系注入单个控制器方法
-class MyController extends Controller
-{
-    public function show(Logger $logger, $id)
-    {
-        $logger->error('Something happened');
-    }
-}
+// class MyController extends Controller
+// {
+//     public function show(Logger $logger, $id)
+//     {
+//         $logger->error('Something happened');
+//     }
+// }
 // 使用容器的call()方法手动调用类的方法
-class Foo
-{
-    public function bar($parameter1)
-    {
-    }
-}
-$foo = new Foo;
-app()->call($foo, 'bar', ['parameter1' => 'value']);
+// class Foo
+// {
+//     public function bar($parameter1)
+//     {
+//     }
+// }
+// $foo = new Foo;
+// app()->call($foo, 'bar', ['parameter1' => 'value']);
 
 
 // facade与容器
-Log::alert('Something has gone wrong!');
-$logger = app('log');
-$logger->alert('Something has gone wrong!');
+// Log::alert('Something has gone wrong!');
+// $logger = app('log');
+// $logger->alert('Something has gone wrong!');
 // 导入facade命名空间
-use Illuminate\Support\Facades\Log;
+// use Illuminate\Support\Facades\Log;
 
-class Controller extends Controller
-{
-    public function index()
-    {
-        Log::error('Something went wrong!');
-    }
-}
+// class Controller extends Controller
+// {
+//     public function index()
+//     {
+//         Log::error('Something went wrong!');
+//     }
+// }
 // Logfacade类
 // namespace Illuminate\Supoport\Facades;
 
@@ -2614,216 +2614,216 @@ class Controller extends Controller
 //     }
 // }
 
-Log::error('Help!');
-app('log')->error('Help!');
+// Log::error('Help!');
+// app('log')->error('Help!');
 
 // 在测试中重写绑定
-class test
-{
-    public function test_it_does_something()
-    {
-        return new DevNullLogger;
-    }
-}
-// 覆盖所有测试的绑定
-class TestCase extends \Illuminate\Foundation\Testing\TestCase
-{
-    public function setUp()
-    {
-        parent::setUp();
-        app()->bind('whatever', 'whatever else');
-    }
-}
+// class test
+// {
+//     public function test_it_does_something()
+//     {
+//         return new DevNullLogger;
+//     }
+// }
+// // 覆盖所有测试的绑定
+// class TestCase extends \Illuminate\Foundation\Testing\TestCase
+// {
+//     public function setUp()
+//     {
+//         parent::setUp();
+//         app()->bind('whatever', 'whatever else');
+//     }
+// }
 
-use Illuminate\Foundation\Testing\WithoutMiddleware;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+// use Illuminate\Foundation\Testing\WithoutMiddleware;
+// use Illuminate\Foundation\Testing\DatabaseMigrations;
+// use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class ExampleTest extends TestCase
-{
-    function testBasicExample()
-    {
-        $this->visit('/')->see('Laravel');
-    }
-    public function test_people_list_shows_person_after_creation()
-    {
-        $this->json('post', 'people', ['name' => 'matt']);
-        $this->json('get', 'people');
-        $this->seeJson(['name' => 'matt']);
-    }
-}
+// class ExampleTest extends TestCase
+// {
+//     function testBasicExample()
+//     {
+//         $this->visit('/')->see('Laravel');
+//     }
+//     public function test_people_list_shows_person_after_creation()
+//     {
+//         $this->json('post', 'people', ['name' => 'matt']);
+//         $this->json('get', 'people');
+//         $this->seeJson(['name' => 'matt']);
+//     }
+// }
 // 命名PHPUnit方法
-class Naming
-{
-    public function test_it_names_things_well()
-    {
-    }
+// class Naming
+// {
+//     public function test_it_names_things_well()
+//     {
+//     }
 
-    public function testItNamesThingsWell()
-    {
-    }
+//     public function testItNamesThingsWell()
+//     {
+//     }
 
-    /** @test */
-    public function it_names_things_well()
-    {
-    }
+//     /** @test */
+//     public function it_names_things_well()
+//     {
+//     }
 
-    public function it_names_things_well()
-    {
-    }
-}
+//     public function it_names_things_well()
+//     {
+//     }
+// }
 
-if (file_exists(dirname(__DIR__) . '/.env.test')) {
-    (new \Dotenv\Dotenv(dirname(__DIR__), '.env.test'))->load();
-}
-$this->visit('/')->see('Laravel');
-$this->visit($url);
-class test
-{
-    public function visit($uri)
-    {
-        $uri = $this->prepareUrlForRequest($uri);
-        $this->call($method, $uri, $parameters, $cookies, $files);
-        $this->clearInputs()->followRedirects()->assertPageLoaded($uri);
-        $this->currentUri = $this->app->make('request')->fullUrl();
-        $this->crawler = new Crawler(
-            $this->response->getContent(),
-            $this->currentUri
-        );
-        return $this;
-    }
-}
-$this->call($method, $uri, $params = [], $cookies = [], $files = [], $server = [], $content = null);
-// $this->get($uri,$headers=[]),->post($uri,$data=[],$headers=[]),->put($uri,$data=[],$headers=[]),->patch(),和->delete();
-$this->json($method, $uri, $data = [], $headers = []);
-$this->followRedirects();
-$this->assertPageLoaded();
-$this->see();
-$this->dontSee();
-$this->seeLink();
-$this->dontSeeLink();
-$this->seeHeader();
-$this->seeCookie();
-$this->seePagels();
-$this->seeInDatabase();
-$this->dontSeeInDatabase();
+// if (file_exists(dirname(__DIR__) . '/.env.test')) {
+//     (new \Dotenv\Dotenv(dirname(__DIR__), '.env.test'))->load();
+// }
+// $this->visit('/')->see('Laravel');
+// $this->visit($url);
+// class test
+// {
+//     public function visit($uri)
+//     {
+//         $uri = $this->prepareUrlForRequest($uri);
+//         $this->call($method, $uri, $parameters, $cookies, $files);
+//         $this->clearInputs()->followRedirects()->assertPageLoaded($uri);
+//         $this->currentUri = $this->app->make('request')->fullUrl();
+//         $this->crawler = new Crawler(
+//             $this->response->getContent(),
+//             $this->currentUri
+//         );
+//         return $this;
+//     }
+// }
+// $this->call($method, $uri, $params = [], $cookies = [], $files = [], $server = [], $content = null);
+// // $this->get($uri,$headers=[]),->post($uri,$data=[],$headers=[]),->put($uri,$data=[],$headers=[]),->patch(),和->delete();
+// $this->json($method, $uri, $data = [], $headers = []);
+// $this->followRedirects();
+// $this->assertPageLoaded();
+// $this->see();
+// $this->dontSee();
+// $this->seeLink();
+// $this->dontSeeLink();
+// $this->seeHeader();
+// $this->seeCookie();
+// $this->seePagels();
+// $this->seeInDatabase();
+// $this->dontSeeInDatabase();
 
-class test2
-{
-    public function test_database_has_user_after_registration()
-    {
-        $this->visit('register')
-            ->fillForm([
-                'email' => 'matt@mattstauffer.co'
-            ])
-            ->submitForm();
-        $this->seeInDatabase('email', ['email' => 'matt@mattstauffer.co']);
-    }
-    public function test_api_returns_certain_json()
-    {
-        $this->json('get', 'users');
-        $this->seeJson(['username' => 'mattstauffer']);
-    }
-    public function test_pages_load_the_way_we_want()
-    {
-        $this->get('people');
-        $this->assertResponseOK();
-        $this->call('post', 'owners');
-        $this->assertResponseStatus(405);
-    }
-    public function test_view_gets_data()
-    {
-        $this->get('test');
-        $this->assertViewHas('foo');
-        $this->assertViewHas('foo', 'bar');
-        $this->assertViewHas('foo', 'baz');
-    }
-    public function test_view_gets_data()
-    {
-        $this->get('test');
-        $this->assertViewHasAll([
-            'foo' => 'bar',
-            'baz' => 'qux'
-        ]);
-    }
-    public function test_events_are_owned_by_user_1()
-    {
-        $this->get('events');
-        $this->assertViewHas('events', function ($events) {
-            return $events->reject(function ($event) {
-                return $event->user_id === 1;
-            })->isEmpty();
-        });
-    }
-    public function test_redirector_works()
-    {
-        $this->get('redirector');
-        $this->assertRedirectedTo('/');
-        $this->assertRedirectedToRoute('home');
-        $this->assertRedirectedToAction('HomeController@index');
-    }
-    public function test_session_has_stuff()
-    {
-        Session::put('foo', 'bar');
-        Session::put('baz', 'qux');
-        $this->assertSessionHas('foo');
-        $this->assertSessionHas('foo', 'bar');
-        $this->assertSessionHasAll([
-            'foo' => 'bar',
-            'baz' => 'qux'
-        ]);
-    }
-    public function test_posting_empty_errors_out()
-    {
-        $this->post('form', []);
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors(['email' => 'The email field is required.']);
-        $this->assertSessionHasErrors(
-            ['email' = '<p>The email field is required.</p>'],
-            '<p>:message</p>'
-        );
-    }
-}
-Route::get('test', function () {
-    return view('test')->with('foo', 'bar');
-});
-Route::get('test', function () {
-    return view('test')->with('foo', 'bar')->with('baz', 'qux');
-});
-$this->assertRedirectedTo();
-$this->assertRedirectedToRoute();
-$this->assertRedirectedToAction();
-Route::get('redirector', function () {
-    return redirect('/');
-});
-Route::get('/', 'HomeController@index')->name('home');
-$this->assertSessionHas($key, $value = '');
+// class test2
+// {
+//     public function test_database_has_user_after_registration()
+//     {
+//         $this->visit('register')
+//             ->fillForm([
+//                 'email' => 'matt@mattstauffer.co'
+//             ])
+//             ->submitForm();
+//         $this->seeInDatabase('email', ['email' => 'matt@mattstauffer.co']);
+//     }
+//     public function test_api_returns_certain_json()
+//     {
+//         $this->json('get', 'users');
+//         $this->seeJson(['username' => 'mattstauffer']);
+//     }
+//     public function test_pages_load_the_way_we_want()
+//     {
+//         $this->get('people');
+//         $this->assertResponseOK();
+//         $this->call('post', 'owners');
+//         $this->assertResponseStatus(405);
+//     }
+//     public function test_view_gets_data()
+//     {
+//         $this->get('test');
+//         $this->assertViewHas('foo');
+//         $this->assertViewHas('foo', 'bar');
+//         $this->assertViewHas('foo', 'baz');
+//     }
+//     public function test_view_gets_data()
+//     {
+//         $this->get('test');
+//         $this->assertViewHasAll([
+//             'foo' => 'bar',
+//             'baz' => 'qux'
+//         ]);
+//     }
+//     public function test_events_are_owned_by_user_1()
+//     {
+//         $this->get('events');
+//         $this->assertViewHas('events', function ($events) {
+//             return $events->reject(function ($event) {
+//                 return $event->user_id === 1;
+//             })->isEmpty();
+//         });
+//     }
+//     public function test_redirector_works()
+//     {
+//         $this->get('redirector');
+//         $this->assertRedirectedTo('/');
+//         $this->assertRedirectedToRoute('home');
+//         $this->assertRedirectedToAction('HomeController@index');
+//     }
+//     public function test_session_has_stuff()
+//     {
+//         Session::put('foo', 'bar');
+//         Session::put('baz', 'qux');
+//         $this->assertSessionHas('foo');
+//         $this->assertSessionHas('foo', 'bar');
+//         $this->assertSessionHasAll([
+//             'foo' => 'bar',
+//             'baz' => 'qux'
+//         ]);
+//     }
+//     public function test_posting_empty_errors_out()
+//     {
+//         $this->post('form', []);
+//         $this->assertSessionHasErrors();
+//         $this->assertSessionHasErrors(['email' => 'The email field is required.']);
+//         $this->assertSessionHasErrors(
+//             ['email' = '<p>The email field is required.</p>'],
+//             '<p>:message</p>'
+//         );
+//     }
+// }
+// Route::get('test', function () {
+//     return view('test')->with('foo', 'bar');
+// });
+// Route::get('test', function () {
+//     return view('test')->with('foo', 'bar')->with('baz', 'qux');
+// });
+// $this->assertRedirectedTo();
+// $this->assertRedirectedToRoute();
+// $this->assertRedirectedToAction();
+// Route::get('redirector', function () {
+//     return redirect('/');
+// });
+// Route::get('/', 'HomeController@index')->name('home');
+// $this->assertSessionHas($key, $value = '');
 
-$this->check($element);
-$this->uncheck($element);
-$this->select($options, $element);
-$this->attach($filePath, $element);
-$this->press($buttonText);
-$this->submitForm($buttonText, $input = [], $uploads = []);
-$this->fileForm($buttonText, $inputs = []);
-$this->clearInputs();
-$this->expectsEvents($eventClassName);
+// $this->check($element);
+// $this->uncheck($element);
+// $this->select($options, $element);
+// $this->attach($filePath, $element);
+// $this->press($buttonText);
+// $this->submitForm($buttonText, $input = [], $uploads = []);
+// $this->fileForm($buttonText, $inputs = []);
+// $this->clearInputs();
+// $this->expectsEvents($eventClassName);
 
 // public function test_usersubscribed_event_fires_when_subscribing(){
 //     $this->expectsEvents(App\Events\UserSubscribed::class);
 //     $this->visit('subscribe')->type('me@me.com','email')->press('Subscribe');
 // }
 // $this->withoutEvents();
-$this->expectsJobs();
+// $this->expectsJobs();
 
 // public function test_number_of_subscriptions_crunches_reports(){
 //     $this->expectsJobs(App\Jobs\CrunchReports::class);
 //     $this->visit('subscribe')->type('me@me.com','email')->press('Subscribe');
 // }
 
-$this->session(['key' => 'value']);
-$this->flushSession();
-$this->be($authenticatable);
+// $this->session(['key' => 'value']);
+// $this->flushSession();
+// $this->be($authenticatable);
 
 // public function test_members_cant_see_admin_dashboard(){
 //     $member = factory(\App\User::class,'member')->create();
@@ -2852,74 +2852,74 @@ $this->be($authenticatable);
 //     }
 // }
 
-// Artisan和Seed
-$this->artisan($command, $parameters = []);
-// public function test_returns_certain_code(){
-//     $this->artisan('do:thing',['--flag0fSomeSort'=>true]);
-//     $this->assertEquals(0,$this->code);
+// // Artisan和Seed
+// $this->artisan($command, $parameters = []);
+// // public function test_returns_certain_code(){
+// //     $this->artisan('do:thing',['--flag0fSomeSort'=>true]);
+// //     $this->assertEquals(0,$this->code);
+// // }
+// $this->seed($seederClassName = 'DatabaseSeeder');
+// // 在Laravel中使用Mockery
+// class SlackClient
+// {
+//     public function send($message, $channel)
+//     {
+//     }
 // }
-$this->seed($seederClassName = 'DatabaseSeeder');
-// 在Laravel中使用Mockery
-class SlackClient
-{
-    public function send($message, $channel)
-    {
-    }
-}
-class Notifier
-{
-    private $slack;
-    public function __construct(SlackClient $slack)
-    {
-        $this->slack = $slack;
-    }
-    public function notifyAdmins($message)
-    {
-        $this->slack->send($message, 'admins');
-    }
-}
-class test
-{
-    public function test_notifier_notifies_admins()
-    {
-        $slackMock = Mockery::mock(SlackClient::class)->shouldIgnoreMissing();
-        $notifier = new Notifier($slackMock);
-        $notifier->notifyAdmins('Test message');
-    }
-}
-$slackMock = Mockery::mock(SlackClient::class)->shouldIgnoreMissing();
+// class Notifier
+// {
+//     private $slack;
+//     public function __construct(SlackClient $slack)
+//     {
+//         $this->slack = $slack;
+//     }
+//     public function notifyAdmins($message)
+//     {
+//         $this->slack->send($message, 'admins');
+//     }
+// }
+// class test
+// {
+//     public function test_notifier_notifies_admins()
+//     {
+//         $slackMock = Mockery::mock(SlackClient::class)->shouldIgnoreMissing();
+//         $notifier = new Notifier($slackMock);
+//         $notifier->notifyAdmins('Test message');
+//     }
+// }
+// $slackMock = Mockery::mock(SlackClient::class)->shouldIgnoreMissing();
 
 // 在Mockery中使用shouldReceive方法
 // public function test_notifier_notifies_admins(){
-$slackMock = Mockery::mock(SlackClient::class);
-$slackMock->shouldReceive('send')->once();
-$notifier = new Notifier($slackMock);
-$notifier->notifyAdmins('Test message');
+// $slackMock = Mockery::mock(SlackClient::class);
+// $slackMock->shouldReceive('send')->once();
+// $notifier = new Notifier($slackMock);
+// $notifier->notifyAdmins('Test message');
 // }
 // 绑定Mockery实例和容器
 // public function test_notifier_notifies_admins(){
-$slackMock = Mockery::mock(SlackClient::class);
-$slackMock->shouldReceive('send')->once();
-app()->instance(SlackClient::class, $slackMock);
-$notifier = app(Notifier::class);
-$notifier->notifyAdmins('Test message');
+// $slackMock = Mockery::mock(SlackClient::class);
+// $slackMock->shouldReceive('send')->once();
+// app()->instance(SlackClient::class, $slackMock);
+// $notifier = app(Notifier::class);
+// $notifier->notifyAdmins('Test message');
 // }
 // 模拟facade
 // public function index(){
-return Cache::remember('people', function () {
-    return Person::all();
-});
+// return Cache::remember('people', function () {
+//     return Person::all();
+// });
 // }
 // public function test_all_people_route_should_be_cached(){
-$person = factory(Person::class)->make();
-Cache::shouldReceive('remember')->once()->andReturn(collect([$person]));
-$this->visit('people')->seeJson(['name' => $person->name]);
+// $person = factory(Person::class)->make();
+// Cache::shouldReceive('remember')->once()->andReturn(collect([$person]));
+// $this->visit('people')->seeJson(['name' => $person->name]);
 // }
 // facade spy
 // public function test_queue_job_should_be_pushed_after_regisration(){
-Cache::spy();
-$this->post('register', ['email' => 'joaquin@me.com']);
-Cache::shouldHaveReceived('push')->with(SendWelcomeEmail::class, ['email' => 'joaquin@me.com']);
+// Cache::spy();
+// $this->post('register', ['email' => 'joaquin@me.com']);
+// Cache::shouldHaveReceived('push')->with(SendWelcomeEmail::class, ['email' => 'joaquin@me.com']);
 // }
 
 // 常见的REST API端点结构
@@ -2927,197 +2927,197 @@ Cache::shouldHaveReceived('push')->with(SendWelcomeEmail::class, ['email' => 'jo
 // php artisan make:controller Api\DogsController --resource
 // 一个已生成的资源控制器
 // <?php
-namespace App\Http\Controllers\Api;
+// namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
-use Illuminate\Database\Migrations\Migration;
+// use Illuminate\Http\Request;
+// use App\Http\Requests;
+// use App\Http\Controllers\Controller;
+// use Illuminate\Database\Migrations\Migration;
 
-class DogsController extends Controller
-{
-    public function index()
-    {
-    }
-    public function create()
-    {
-    }
-    public function store(Request $request)
-    {
-    }
-    public function show($id)
-    {
-    }
-    public function edit($id)
-    {
-    }
-    public function update(Request $request, $id)
-    {
-    }
-    public function destroy($id)
-    {
-    }
-}
+// class DogsController extends Controller
+// {
+//     public function index()
+//     {
+//     }
+//     public function create()
+//     {
+//     }
+//     public function store(Request $request)
+//     {
+//     }
+//     public function show($id)
+//     {
+//     }
+//     public function edit($id)
+//     {
+//     }
+//     public function update(Request $request, $id)
+//     {
+//     }
+//     public function destroy($id)
+//     {
+//     }
+// }
 
 // php artisan make:model Dog --migration
 // php artisan migrate
 
-// dog实体的资源控制器示例
-class DogsController extends Controller
-{
-    public function index()
-    {
-        return Dog::all();
-    }
-    public function strore(Request $request)
-    {
-        Dog::create($request->all());
-    }
-    public function show($id)
-    {
-        return Dog::findOrFail($id);
-    }
-    public function update(Request $request, $id)
-    {
-        $dog = Dog::findOrFail($id);
-        $dog->update($request->all());
-    }
-    public function destroy($id)
-    {
-        $dog = Dog::findOrFail($id);
-        $dog->delete();
-    }
-}
+// // dog实体的资源控制器示例
+// class DogsController extends Controller
+// {
+//     public function index()
+//     {
+//         return Dog::all();
+//     }
+//     public function strore(Request $request)
+//     {
+//         Dog::create($request->all());
+//     }
+//     public function show($id)
+//     {
+//         return Dog::findOrFail($id);
+//     }
+//     public function update(Request $request, $id)
+//     {
+//         $dog = Dog::findOrFail($id);
+//         $dog->update($request->all());
+//     }
+//     public function destroy($id)
+//     {
+//         $dog = Dog::findOrFail($id);
+//         $dog->delete();
+//     }
+// }
 
-// 为资源控制器绑定路由
-Route::group(['prefix' => 'api', 'namespace' => 'Api', function () {
-    Route::resource('dogs', 'DogsController');
-}]);
-// Accept::application/vnd.github.v3+json
-// 在Laravel中添加响应头
-Route::get('dogs', function () {
-    return response(Dog::all())->header('X-Greatness-Index', 9);
-});
-// 在Laravel中读取请求头
-Route::get('dogs', function (Request $request) {
-    echo $request->header('Accept');
-});
-// 分页的API路由
-Route::get('dogs', function () {
-    return Dog::paginate(20);
-});
-// 在查询构造器调用中使用paginate()方法
-Route::get('dogs', function () {
-    return DB::table('dogs')->paginate(20);
-});
-// 最简单的的API排序
-Route::get('dogs', function (Request $request) {
-    $sortCol = $request->input('sort', 'name');
-    return Dog::orderBy($sortCol)->paginate(20);
-});
-// 指定排序方向的单列API排序
-Route::get('dogs', function (Request $request) {
-    $sortCol = $request->input('sort', 'name');
-    $sortDir = starts_with($sortCol, '-') ? 'desc' : 'asc';
-    $sortCol = ltrim($sort, '-');
-    return Dog::orderBy($sortCol, $sortDir)->paginate(20);
-});
-// JSON API风格的排序
-Route::get('dogs', function (Request $request) {
-    $sorts = explode(',', $request->input('sort', ''));
-    $query = Dog::query();
-    foreach ($sorts as $sortCol) {
-        $sortDir = starts_with($sortCol, '-') ? 'desc' : 'asc';
-        $sortCol = ltrim($sort, '-');
-        $query->orderBy($sortCol, $sortDir);
-    }
-    return $query->paginate(20);
-});
-// API结果的单词筛选
-Route::get('dogs', function (Request $request) {
-    $query = Dog::query();
-    if ($request->has('filter')) {
-        list($criteria, $value) = explode(':', $request->input('filter'));
-        $query->where($criteria, $value);
-    }
-    return $query->paginate(20);
-});
-// API结果的多条件筛选
-Route::get('dogs', function (Request $request) {
-    $query = Dog::query();
-    if ($request->has('filter')) {
-        $filters = explode(',', $request->input('filter'));
-        foreach ($filters as $filter) {
-            list($criteria, $value) = explode(':', $filter);
-            $query->where($criteria, $value);
-        }
-    }
-    return $query->paginate(20);
-});
-// 简单的转换器
-Route::get('users/{id}', function ($userId) {
-    return (new UserTransformer(User::findOrFail($userId)));
-});
-class UserTransformer
-{
-    protected $user;
-    public function __construct($user)
-    {
-        $this->user = $user;
-    }
-    public function toArray()
-    {
-        return [
-            'id' => $this->user->id,
-            'name' => sprintf(
-                "%S %S",
-                $this->user->first_name,
-                $this->user->last_name
-            ),
-            'friendsCount' => $this->user->friends->count()
-        ];
-    }
-    public function toJson()
-    {
-        return json_encode($this->toArray());
-    }
-    public function __toString()
-    {
-        return $this->toJson();
-    }
-}
-// 在转换器中允许资源的选择性嵌入
-Route::get('users/{id}', function ($userId, Request $request) {
-    $embeds = explode(',', $request->input('embed', ''));
-    return (new UserTransformer(User::findOrFail($userId), $embeds));
-});
-class UserTransformer
-{
-    protected $user;
-    protected $embeds;
-    public function __construct($user, $embeds = [])
-    {
-        $this->user = $user;
-        $this->embeds = $embeds;
-    }
-    public function toArray()
-    {
-        $append = [];
-        if (in_array('friends', $this->embeds)) {
-            $append['friends'] = $this->user->friends->map(function ($friend) {
-                return (new FriendTransformer($friend))->toArray();
-            });
-        }
-        return array_merge([
-            'id' => $this->user->id,
-            'name' => sprintf(
-                "%S %S",
-                $this->user->first_name,
-                $this->user->last_name
-            )
-        ], $append);
-    }
-}
+// // 为资源控制器绑定路由
+// Route::group(['prefix' => 'api', 'namespace' => 'Api', function () {
+//     Route::resource('dogs', 'DogsController');
+// }]);
+// // Accept::application/vnd.github.v3+json
+// // 在Laravel中添加响应头
+// Route::get('dogs', function () {
+//     return response(Dog::all())->header('X-Greatness-Index', 9);
+// });
+// // 在Laravel中读取请求头
+// Route::get('dogs', function (Request $request) {
+//     echo $request->header('Accept');
+// });
+// // 分页的API路由
+// Route::get('dogs', function () {
+//     return Dog::paginate(20);
+// });
+// // 在查询构造器调用中使用paginate()方法
+// Route::get('dogs', function () {
+//     return DB::table('dogs')->paginate(20);
+// });
+// // 最简单的的API排序
+// Route::get('dogs', function (Request $request) {
+//     $sortCol = $request->input('sort', 'name');
+//     return Dog::orderBy($sortCol)->paginate(20);
+// });
+// // 指定排序方向的单列API排序
+// Route::get('dogs', function (Request $request) {
+//     $sortCol = $request->input('sort', 'name');
+//     $sortDir = starts_with($sortCol, '-') ? 'desc' : 'asc';
+//     $sortCol = ltrim($sort, '-');
+//     return Dog::orderBy($sortCol, $sortDir)->paginate(20);
+// });
+// // JSON API风格的排序
+// Route::get('dogs', function (Request $request) {
+//     $sorts = explode(',', $request->input('sort', ''));
+//     $query = Dog::query();
+//     foreach ($sorts as $sortCol) {
+//         $sortDir = starts_with($sortCol, '-') ? 'desc' : 'asc';
+//         $sortCol = ltrim($sort, '-');
+//         $query->orderBy($sortCol, $sortDir);
+//     }
+//     return $query->paginate(20);
+// });
+// // API结果的单词筛选
+// Route::get('dogs', function (Request $request) {
+//     $query = Dog::query();
+//     if ($request->has('filter')) {
+//         list($criteria, $value) = explode(':', $request->input('filter'));
+//         $query->where($criteria, $value);
+//     }
+//     return $query->paginate(20);
+// });
+// // API结果的多条件筛选
+// Route::get('dogs', function (Request $request) {
+//     $query = Dog::query();
+//     if ($request->has('filter')) {
+//         $filters = explode(',', $request->input('filter'));
+//         foreach ($filters as $filter) {
+//             list($criteria, $value) = explode(':', $filter);
+//             $query->where($criteria, $value);
+//         }
+//     }
+//     return $query->paginate(20);
+// });
+// // 简单的转换器
+// Route::get('users/{id}', function ($userId) {
+//     return (new UserTransformer(User::findOrFail($userId)));
+// });
+// class UserTransformer
+// {
+//     protected $user;
+//     public function __construct($user)
+//     {
+//         $this->user = $user;
+//     }
+//     public function toArray()
+//     {
+//         return [
+//             'id' => $this->user->id,
+//             'name' => sprintf(
+//                 "%S %S",
+//                 $this->user->first_name,
+//                 $this->user->last_name
+//             ),
+//             'friendsCount' => $this->user->friends->count()
+//         ];
+//     }
+//     public function toJson()
+//     {
+//         return json_encode($this->toArray());
+//     }
+//     public function __toString()
+//     {
+//         return $this->toJson();
+//     }
+// }
+// // 在转换器中允许资源的选择性嵌入
+// Route::get('users/{id}', function ($userId, Request $request) {
+//     $embeds = explode(',', $request->input('embed', ''));
+//     return (new UserTransformer(User::findOrFail($userId), $embeds));
+// });
+// class UserTransformer
+// {
+//     protected $user;
+//     protected $embeds;
+//     public function __construct($user, $embeds = [])
+//     {
+//         $this->user = $user;
+//         $this->embeds = $embeds;
+//     }
+//     public function toArray()
+//     {
+//         $append = [];
+//         if (in_array('friends', $this->embeds)) {
+//             $append['friends'] = $this->user->friends->map(function ($friend) {
+//                 return (new FriendTransformer($friend))->toArray();
+//             });
+//         }
+//         return array_merge([
+//             'id' => $this->user->id,
+//             'name' => sprintf(
+//                 "%S %S",
+//                 $this->user->first_name,
+//                 $this->user->last_name
+//             )
+//         ], $append);
+//     }
+// }
 // composer require laravel/passport
 // oauth/authorize
 // oauth/clients
@@ -3130,100 +3130,100 @@ class UserTransformer
 // oauth/tokens
 // oauth/tokens/{token_id}
 // 通过Passport认证中间件保护API路由
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:api');
-// 使用Bearer令牌发送API请求
-$http = new GuzzleHttp\Client;
-$response = $http->request('GET', 'http://speakr.dev/api/user', [
-    'headers' => [
-        'Accept' => 'application/json',
-        'Authorization' => 'Bearer' . $accessToken,
-    ],
-]);
-// php artisan password:client --password
-// 使用密码授权类型发送请求
-Route::get('speaker/password-grant-auth', function () {
-    $http = new GuzzleHttp\Client;
-    $response = $http->post('http://speaker.dev/oauth/token', [
-        'form_params' => [
-            'grant_type' => 'password',
-            'client_id' => config('speakr.id'),
-            'client_secret' => config('speakr.secret'),
-            'username' => 'matt@mattstauffer.co',
-            'password' => 'my-speakr-password',
-        ],
-    ]);
-    $thisUsersTokens = json_decode((string) $response->getBody(), true);
-});
-// 将用户重定向到OAuth服务器的消费性应用中
-Route::get('speakr/redirect', function () {
-    $query = http_build_query([
-        'client_id' => config('speakr.id'),
-        'redirect_uri' => url('speakr/callback'),
-        'response_type' => 'code',
-    ]);
-    return redirect('http://speakr.dev/oauth/authorize?' . $query);
-});
-// php artisan vendor:publish --tag=passport-views
-// 应用中的授权回调路由
-Route::get('speakr/callback', function (Request $request) {
-    if ($request->has('error')) {
-    }
-    $http = new GuzzleHttp\Client;
-    $response = $http->post('http://speakr.dev/oauth/token', [
-        'form_params' => [
-            'grant_type' => 'authorization_code',
-            'client_id' => config('speakr.id'),
-            'client_secret' => config('speakr.secret'),
-            'redirect_uri' => url('speakr/callback'),
-            'code' => $request->code,
-        ],
-    ]);
-    $thisUsersTokens = json_decode((string)$response->getBody(), true);
-});
-// 设置一个较短的刷新时间
-class test
-{
-    public function boot()
-    {
-        $this->registerPolicies();
-        Passport::routes();
-        Passport::tokensExpireIn(
-            Carbon::now()->addDays(15)
-        );
-        Passport::refreshTokensExpireIn(
-            Carbon::now()->addDays(30)
-        );
-    }
-}
-// 在SpaceBook的routes/we.php中
-Route::get(
-    'speakr/request-refresh',
-    function (Request $request) {
-        $http = new GuzzleHttp\Client;
-        $params = [
-            'grant_type' => 'refresh_token',
-            'client_id' => config('speakr.id'),
-            'client_secret' => config('speakr.secret'),
-            'redirect_uri' => url('speakr/callback'),
-            'refresh_token' => $theTokenYouSaveEarlier,
-        ];
-        $response = $http->post(
-            'http://speakr.dev/oauth/token',
-            ['form_params' => $params]
-        );
-        $thisUsersTokens = json_decode(
-            (string)$response->getBody(),
-            true
-        );
-    }
-);
-// 创建个人访问客户端
-// php artisan passport:client --personal
+// Route::get('/user', function (Request $request) {
+//     return $request->user();
+// })->middleware('auth:api');
+// // 使用Bearer令牌发送API请求
+// $http = new GuzzleHttp\Client;
+// $response = $http->request('GET', 'http://speakr.dev/api/user', [
+//     'headers' => [
+//         'Accept' => 'application/json',
+//         'Authorization' => 'Bearer' . $accessToken,
+//     ],
+// ]);
+// // php artisan password:client --password
+// // 使用密码授权类型发送请求
+// Route::get('speaker/password-grant-auth', function () {
+//     $http = new GuzzleHttp\Client;
+//     $response = $http->post('http://speaker.dev/oauth/token', [
+//         'form_params' => [
+//             'grant_type' => 'password',
+//             'client_id' => config('speakr.id'),
+//             'client_secret' => config('speakr.secret'),
+//             'username' => 'matt@mattstauffer.co',
+//             'password' => 'my-speakr-password',
+//         ],
+//     ]);
+//     $thisUsersTokens = json_decode((string) $response->getBody(), true);
+// });
+// // 将用户重定向到OAuth服务器的消费性应用中
+// Route::get('speakr/redirect', function () {
+//     $query = http_build_query([
+//         'client_id' => config('speakr.id'),
+//         'redirect_uri' => url('speakr/callback'),
+//         'response_type' => 'code',
+//     ]);
+//     return redirect('http://speakr.dev/oauth/authorize?' . $query);
+// });
+// // php artisan vendor:publish --tag=passport-views
+// // 应用中的授权回调路由
+// Route::get('speakr/callback', function (Request $request) {
+//     if ($request->has('error')) {
+//     }
+//     $http = new GuzzleHttp\Client;
+//     $response = $http->post('http://speakr.dev/oauth/token', [
+//         'form_params' => [
+//             'grant_type' => 'authorization_code',
+//             'client_id' => config('speakr.id'),
+//             'client_secret' => config('speakr.secret'),
+//             'redirect_uri' => url('speakr/callback'),
+//             'code' => $request->code,
+//         ],
+//     ]);
+//     $thisUsersTokens = json_decode((string)$response->getBody(), true);
+// });
+// // 设置一个较短的刷新时间
+// class test
+// {
+//     public function boot()
+//     {
+//         $this->registerPolicies();
+//         Passport::routes();
+//         Passport::tokensExpireIn(
+//             Carbon::now()->addDays(15)
+//         );
+//         Passport::refreshTokensExpireIn(
+//             Carbon::now()->addDays(30)
+//         );
+//     }
+// }
+// // 在SpaceBook的routes/we.php中
+// Route::get(
+//     'speakr/request-refresh',
+//     function (Request $request) {
+//         $http = new GuzzleHttp\Client;
+//         $params = [
+//             'grant_type' => 'refresh_token',
+//             'client_id' => config('speakr.id'),
+//             'client_secret' => config('speakr.secret'),
+//             'redirect_uri' => url('speakr/callback'),
+//             'refresh_token' => $theTokenYouSaveEarlier,
+//         ];
+//         $response = $http->post(
+//             'http://speakr.dev/oauth/token',
+//             ['form_params' => $params]
+//         );
+//         $thisUsersTokens = json_decode(
+//             (string)$response->getBody(),
+//             true
+//         );
+//     }
+// );
+// // 创建个人访问客户端
+// // php artisan passport:client --personal
 
-$token = $user->createToken('Token Name')->accessToken;
-$token = $user->cerateToken('My Token', ['place-orders'])->accessToken;
+// $token = $user->createToken('Token Name')->accessToken;
+// $token = $user->cerateToken('My Token', ['place-orders'])->accessToken;
 // 设置jQuery以便传递所有AJAX请求的LaravelCSRF令牌
 // $ajaxSetup({
 //     'headers':{
@@ -3259,7 +3259,7 @@ $token = $user->cerateToken('My Token', ['place-orders'])->accessToken;
 // <passport-authorized-clients></passport-authorized-clients>
 // <passport-personal-access-tokens></passport-personal-access-tokens>
 // 定义Passport作用域
-use Laravel\Passport\Passport;
+// use Laravel\Passport\Passport;
 // public function boot(){
 //     Passport::tokensCan([
 //         'list-clips'=>'List sound clips',
@@ -3267,49 +3267,49 @@ use Laravel\Passport\Passport;
 //         'admin-account'=>'Administer account details',
 //     ]);
 // }
-// 请求授权访问特定作用域
-Route::get('speakr/redirect', function () {
-    $query = http_build_query([
-        'client_id' => config('speakr.id'),
-        'redirect_uri' => url('speakr/callback'),
-        'response_type' => 'code',
-        'scope' => 'list-clips add-delete-clips'
-    ]);
-    return redirect('http://speakr.dev/oauth/authorize?' . $query);
-});
-// 检查一个用户认证的令牌是否能执行给定的操作
-Route::get('events', function () {
-    if (auth()->user()->tokenCan('add-delete-clips')) {
-    }
-});
-// 使用中间件来限制基于令牌作用域的访问
-Route::get('clips', function () {
-})->middleware('scopes:list-clips,add-delete-clips');
-Route::get('clips', function () {
-})->middleware('scope:list-clips,add-delete-clips');
-$table->string('api_token', 60)->unique();
-// 在路由组织中使用API认证中间件
-Route::group(['prefix' => 'api', 'middleware' => 'auth:api'], function () {
-});
-$user = auth()->guard('api')->user();
-// 一个常见的API测试模式
-class DogsApiTest extends TestCase
-{
-    use WithoutMiddleware, DatabaseMigrations;
-    public function test_it_gets_all_dogs()
-    {
-        $this->be(factory(User::class)->create());
-        $dog1 = factory(Dog::class)->create();
-        $dog2 = factory(Dog::class)->create();
-        $this->visit('api/dogs');
-        $this->seeJson([
-            'name' => $dog1->name
-        ]);
-        $this->seeJson([
-            'name' => $dog2->name
-        ]);
-    }
-}
+// // 请求授权访问特定作用域
+// Route::get('speakr/redirect', function () {
+//     $query = http_build_query([
+//         'client_id' => config('speakr.id'),
+//         'redirect_uri' => url('speakr/callback'),
+//         'response_type' => 'code',
+//         'scope' => 'list-clips add-delete-clips'
+//     ]);
+//     return redirect('http://speakr.dev/oauth/authorize?' . $query);
+// });
+// // 检查一个用户认证的令牌是否能执行给定的操作
+// Route::get('events', function () {
+//     if (auth()->user()->tokenCan('add-delete-clips')) {
+//     }
+// });
+// // 使用中间件来限制基于令牌作用域的访问
+// Route::get('clips', function () {
+// })->middleware('scopes:list-clips,add-delete-clips');
+// Route::get('clips', function () {
+// })->middleware('scope:list-clips,add-delete-clips');
+// $table->string('api_token', 60)->unique();
+// // 在路由组织中使用API认证中间件
+// Route::group(['prefix' => 'api', 'middleware' => 'auth:api'], function () {
+// });
+// $user = auth()->guard('api')->user();
+// // 一个常见的API测试模式
+// class DogsApiTest extends TestCase
+// {
+//     use WithoutMiddleware, DatabaseMigrations;
+//     public function test_it_gets_all_dogs()
+//     {
+//         $this->be(factory(User::class)->create());
+//         $dog1 = factory(Dog::class)->create();
+//         $dog2 = factory(Dog::class)->create();
+//         $this->visit('api/dogs');
+//         $this->seeJson([
+//             'name' => $dog1->name
+//         ]);
+//         $this->seeJson([
+//             'name' => $dog2->name
+//         ]);
+//     }
+// }
 // 默认可用的存储磁盘
 // 'disks'=>[
 //     'local'=>[
@@ -3361,56 +3361,56 @@ class DogsApiTest extends TestCase
 //     }
 // }
 
-// 使用Intervention进行更复杂的文件上传
-class DogsController
-{
-    public function updatePicture(Request $request, Dog $dog)
-    {
-        $original = $request->file('picture');
-        $image = Image::make($original)->resize(150, null, function ($constraint) {
-            $constraint->aspectRatio();
-        })->encode('jpg', 75);
-        Storage::put(
-            'dogs/thumbs' . $dog->id,
-            $image->getEncoded()
-        );
-    }
-}
+// // 使用Intervention进行更复杂的文件上传
+// class DogsController
+// {
+//     public function updatePicture(Request $request, Dog $dog)
+//     {
+//         $original = $request->file('picture');
+//         $image = Image::make($original)->resize(150, null, function ($constraint) {
+//             $constraint->aspectRatio();
+//         })->encode('jpg', 75);
+//         Storage::put(
+//             'dogs/thumbs' . $dog->id,
+//             $image->getEncoded()
+//         );
+//     }
+// }
 
-// 在响应对象上使用session()方法
-Route::get('dashboard', function (Request $request) {
-    $request->session()->get('user_id');
-});
-// 为会话注入支持类
-Route::get('dashboard', function (Illuminate\Session\Store $session) {
-    return $session->get('user_id');
-});
-// 使用全局session()帮手
-$value = session()->get('key');
-$value = session('key');
-session()->put('key', 'value');
-session(['key', 'value']);
-session()->get($key, $fallbackValue);
+// // 在响应对象上使用session()方法
+// Route::get('dashboard', function (Request $request) {
+//     $request->session()->get('user_id');
+// });
+// // 为会话注入支持类
+// Route::get('dashboard', function (Illuminate\Session\Store $session) {
+//     return $session->get('user_id');
+// });
+// // 使用全局session()帮手
+// $value = session()->get('key');
+// $value = session('key');
+// session()->put('key', 'value');
+// session(['key', 'value']);
+// session()->get($key, $fallbackValue);
 
-$points = session()->get('points');
-$points = session()->get('points', 0);
-$points = session()->get('points', function () {
-    return (new PointGetterService)->getPoints();
-});
-session()->put($key, $value);
-session()->put('points', 45);
-$points = session()->get('points');
-session()->push($key, $value);
-session()->put('friends', ['Saul', 'Quang', 'Mechteld']);
-session()->push('friends', 'Javier');
-session()->has($key);
-if (session()->has('points')) {
-}
-session()->forget($key);
-session()->flush();
-session()->put('a', 'awesome');
-session()->put('b', 'bodacious');
-session()->forget('a');
-session()->flush();
-session()->pull($key, $fallbackValue);
-session()->regenerate();
+// $points = session()->get('points');
+// $points = session()->get('points', 0);
+// $points = session()->get('points', function () {
+//     return (new PointGetterService)->getPoints();
+// });
+// session()->put($key, $value);
+// session()->put('points', 45);
+// $points = session()->get('points');
+// session()->push($key, $value);
+// session()->put('friends', ['Saul', 'Quang', 'Mechteld']);
+// session()->push('friends', 'Javier');
+// session()->has($key);
+// if (session()->has('points')) {
+// }
+// session()->forget($key);
+// session()->flush();
+// session()->put('a', 'awesome');
+// session()->put('b', 'bodacious');
+// session()->forget('a');
+// session()->flush();
+// session()->pull($key, $fallbackValue);
+// session()->regenerate();

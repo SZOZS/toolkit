@@ -834,4 +834,113 @@
     Notification::send($users,new WorkoutAvailable($workout));
 ``` 
 #### 排队通知
-    大多数通知驱动程序需要发送HTTP请求从而发送通知
+    大多数通知驱动程序需要发送HTTP请求从而发送通知，这有可能会降低用户体验，因此我们将通知进行排队，从而提升用户体验。所有通知都会默认被导入Queuable triat，因此我们需要做的仅仅是在通知中添加一个implements ShouldQueue,Laravel便会立即把该通知移到队列中去。
+    和其他所有的排队功能一样，需要保证队列都正确地设置配置，队列工作者也在运行中。
+    如果想要延迟通知的传送，可以运行delay()方法。
+```
+    $delayUntil = Carbon::now()->addMinutes(15);
+    $user->notify((new WorkoutAvailable($workout))->delay($delayUntil));
+```
+#### 开箱即用的通知类型
+    开箱即用，即Laravel为电子邮件、数据库、广播、Nexmo SMS和Slack提供的通知驱动软件。下面我们简单介绍一下开箱即用，建议大家参考官方文档(https:/laravel.com/docs/notifications),以便全面深入理解。
+    创建通知驱动软件非常容易，可以在Laravel Notification Channels网站(http://laravel-notification-channels.com)找到详细方法。
+##### 电子邮件通知
+    来看一下示例15-11中的电子邮件是如何创建的。
+```
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+            ->line("You have a new workout available!")
+            ->action("Check it out now",route("workout",[$this->workout]))
+            ->line("Thank you for training with us!");
+    }
+```
+    结果如图15-1所示，电子邮件通知系统将应用名放置于电子邮件的头部，也可以在config/app.php的name关键字中自定义应用程序的名称。
+    这封电子邮件会自动发送给通知对象的email属性，我们也可以通过向一个名为routeNotificationForMail()的类添加方法来自定义上述操作，这个类会返回我们想要发送电子邮件通知的目标地址。
+    电子邮件的主题是通过解析通知类名并转换成文字来设定的。因此，WorkoutAvailable通知将会具有Workout Available的默认主题。也可以通过将subject()方法连接到toMail()方法中的MailMessage上来自定义主题。
+    如果想要修改模板，需要发布并编辑核心内容，方法如下。
+```
+    php artisan vender::publish --tag=laravel-notifications
+```
+    也可以将默认模板的样式更改为“错误”消息，该消息使用不同的编程语言，并且将主按钮的颜色变为红色。只需在toMail()方法中的MailMessage调用链中添加一个error()方法调用即可实现。
+##### 数据库通知
+    可以通过使用数据库通知频道向数据库表发送通知。首先没使用php artisan notifications : table语句创建一个新表。然后，在通知中创建一个toDatabase()方法,改方法会针对通知返回一个数据数组，该数据数组以JSON格式编码存储到数据库表的数据列中。
+    Notifiable trait会向导入的所有模型中都添加一个通知关系，这样就可以轻松地访问通知表中的记录了，如果使用数据库通知，则可以像下面这样进行操作。
+```
+    User::first()->notifications->each(function($notification){
+        // 完成某些功能
+    });
+```
+    数据库通知频道也有一个表示通知是否“已读”的标记。可以试着只标记“未读”通知，代码如下。
+```
+    User::first()->unreadNotifiacations->each(function($notification){
+        // 完成某些功能
+    });
+```
+    也可以将某个或所有的通知都标记为已读。
+```
+    // 某个
+    User::first()->notifications->each(function ($notification){
+        if($condition){
+            $notification->markAsRead();
+        }
+    });
+    // 所有
+    User::first()->unreadNotifications->markAsRead();
+```
+##### 广播通知
+    广播通知频道使用Laravel的事件广播功能(Echo)来发送通知。
+    在通知上创建一个toBroadcast()方法并返回数据数组，如果应用程序正确配置为事件广播，则数据将在名为{notifiable}{id}的私有频道上广播。{id}就是通知对象的ID，{notifiable}是通知对象的完全限定类名称，其中“斜杠”可以用“句点”来代替————例如，ID为1的App\User的私有频道可以表示为App.User.1。
+##### SMS通知
+    SMS通知是通过Nexmo发送的，因此，如果想要发送SMS通知，则需要注册一个nexmo账户，然后遵循文件(https://laravel.com/docs/notifications)中的说明进行操作。与其他频道一样，我们需要设置一个toNexmo()方法然后自定义消息内容。
+##### Skack通知
+    slack通知频道支持自定义通知形式，甚至可以向通知中添加附件。和其他频道一样，我们需要设置一个toSlack()方法然后自定义消息内容。
+#### 测试
+    下面介绍如何测试邮件和通知。
+#### 邮件
+    Laravel中有俩种测试邮件的选项。如果使用传统邮件语法，建议使用由Adam Wathan为Tighten编写的MailThief(https://github.com/tightenco/mailthief)工具。一旦使用Composer将MailThief引入应用程序中，就可以在测试中使用MailThief::hijack(),使MailThief捕捉到所有对Mail facade或邮件发送人类的调用。
+    然后，MailThief就能对发件人、收件人、抄送、密件抄送，甚至邮件的内容及附件做出断言。
+    想要了解更多内容请参考Github，或在应用程序中进行验证。
+```
+    composer require tightenco/mailthief --dev
+```
+    如果使用mailable，则有一个简单的语法可用于为发送的邮件编写所有断言(见实例15-16)。
+###### 示例15-16 针对mailable编写断言
+```
+    public function test_signup_triggers_welcome_email()
+    {
+        ...
+        Mail::assertSent(WelcomeEmail::class,function($e){
+            return $e->subject == "Welcome";
+        });
+        // 也可以使用assertSentTo()方法直接测试收件人
+    }
+```
+#### 通知
+    laravel提供了一组内置的断言来测试通知，见示例15-17。
+###### 示例15-17 发送断言通知
+```
+    public function test_new_signups_triggers_admin_notification()
+    {
+        ...
+        Notification::assertSentTo($user,NewUsersSignedup::class,function($n,$channels){
+            return $n->user->email == "user-who-signed-up@gmail.com" && $channels == ["mail"];
+        });
+        // 也可以使用assertNotSentTo()方法
+    }
+```
+#### 本章小结
+    Laravel的邮件和通知功能为多种不同的通知系统提供了简单、一致的界面。Laravel的邮件系统使用“mailable”表示电子邮件的PHP类，为不同的邮件驱动程序提供了一致的语法。通知系统可以轻易实现构建单个通知的功能，该通知可以在多种不同媒体中传送————无论通过电子邮件、SMS，还是实际生活中的邮寄。
+
+
+
+### 第16章 队列，任务，事件，广播及调度程序
+    到目前为止，我们已经介绍了驱动网络应用程序中最常见的一些结构:数据库、邮件、文件系统等。这些在大多数应用程序和框架中都很常见。
+    laravel还为一些不太常见的架构模式和应用程序结构提供了可用工具。在这一章中，我们将介绍Laravel中用于实现队列、队列任务、事件和WebSocket事件发布的工具。我们还将讨论Laravel的调度程序，调度程序的出现是cron逐渐淡出人们的视线。
+#### 队列
+    要理解队列是什么，可以参考在银行中排队的场景。即使有很多行(队列)，但每一个队列中只有一个人在享受服务，每个人最终都将到达前端并享受服务。一些银行有严格的“先入先出”的原则，但在其他的一些银行中，并没有严格保障，保证不会有人在你前方某处插队。大体上来说，有的人可以插入队列并提前离开，或者成功地办理业务，然后离开。有的人甚至可能已经到达队列的前端但没有得到想要的服务，然后回到队列中再次等待办理。
+    编程中的队列与上述场景是十分相似的。应用程序执行特定行为的大段代码作为“任务”被添加到队列中，然后通常作为“队列工作者”的其他独立的应用程序结构负责从队列中拉取一个任务并执行适当的行为。队列工作者可以删除任务，将它们延迟返回队列，或将其标记为处理成功的任务。
+    Laravel可以通过使用Redis、beanstalkd、Amazon的SQS(简单队列服务)或数据库表单使得为队列提供服务变得容易。还可以选择sync驱动使任务在应用程序中正确运行但无需排队，否则任务的null驱动程序将被丢弃。以上两种情况用于本地开发或测试环境中。
+#### 为什么使用队列
+    使用队列可以很轻松地从同步调用中删除昂贵或缓慢的进程。最常见的例子是发送邮件————这样做可能比较慢，而且我们不希望用户等待邮件发送来相应他们的操作。相反，触发“发送邮件”排队任务，可以让使用者继续做他们自己的事情。有时我们不只是希望节省用户的时间，也可能会有一个cron任务或webhook进程需要处理，我们不希望它从头到尾只运行一次(可能超时)，因此可以选择对这些翻个部分进行排队，并让队列工作者逐个对其进行处理。
+    此外，如果有一些超出服务器处理范围的重大进程，则可以让多个队列工作者加快转发速度，比正常应用程序服务器独自完成队列工作更快。

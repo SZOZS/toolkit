@@ -944,3 +944,88 @@
 #### 为什么使用队列
     使用队列可以很轻松地从同步调用中删除昂贵或缓慢的进程。最常见的例子是发送邮件————这样做可能比较慢，而且我们不希望用户等待邮件发送来相应他们的操作。相反，触发“发送邮件”排队任务，可以让使用者继续做他们自己的事情。有时我们不只是希望节省用户的时间，也可能会有一个cron任务或webhook进程需要处理，我们不希望它从头到尾只运行一次(可能超时)，因此可以选择对这些翻个部分进行排队，并让队列工作者逐个对其进行处理。
     此外，如果有一些超出服务器处理范围的重大进程，则可以让多个队列工作者加快转发速度，比正常应用程序服务器独自完成队列工作更快。
+#### 基本队列配置
+    像许多抽象了多个程序提供者的其他Laravel的功能一样，队列有自己的专用配置文件(config/queue.php)，允许设置多个驱动程序并定义默认的驱动程序。这也是存储SQS、Redis或beanstalkd身份验证信息的地方。
+##### Laravel Forge上的简单beanstalkd队列
+    我们尚未深入了解Laravel Forge(http://forge.laravel.com/),这是由Laravel的创始人Taylor Otwell提供的一项托管服务。我们创建的每个服务器都会自动配置beanstalkd,所以当访问任何站点的Forge控制台时，都可以直接进入“Queue Workers”标签，点击Start Worker，使用beanstalkd作为队列驱动程序。通过这种方式，我们可以保留所有默认设置，并且不需要进行其他操作。
+#### 队列任务
+    还记得前面提到的银行排队的类比吗？在编程术语中，银行队列(行)中的每个人都是一项待办任务。这项任务可以任意改变，它可以只是一个字符串，一个数组，或者一个对象。在Laravel中，它是包含任务名称、数据有效载荷、到目前为止所操作的次数，以及其他一些简单元数据的系列信息。
+    我们无需担心与Laravel互动。Laravel提供了一个名为Job的结构，它的目的是封装单个任务————可以命令应用程序执行的行为————并且允许将其添加到队列中或从队列中提取。还有一些简单的帮助程序，可以方便地对Artisan命令和邮件进行排队。
+    下面来看一个具体示例：用户使用我们的SaaS应用程序改变其计划，我们想要返回关于整体利润的计算。
+##### 创建任务
+    和之前一样，Artisan命令如下
+```
+    php artisan make:job CrunchReports
+```
+    参照示例16-1，查看运行结果。
+###### 示例16-1 Laravel中任务的默认模板
+```
+    <?php
+    use Illuminate\Bus\Queueable;
+    use Illuminate\Queue\SerializesModels;
+    use Illuminate\Queue\InteractsWithQueue;
+    use Illuminate\Contracts\Queue\ShouldQueue;
+
+    class CrunchReports implements ShouldQueue
+    {
+        use InteractsWithQueue,Queueable,SerializesModels;
+
+        // 创建一个新的任务实例
+        public function __construct()
+        {
+
+        }
+
+        // 执行任务
+        public function handle()
+        {
+
+        }
+    }
+```
+    可以看到，这个模板引入了Queueable、InteractsWithQueue和SerializesModels的特性，并实现了ShouldQueue接口。在Laravel5.3版本之前，这些功能是通过父类App\Jobs来实现的。
+    我们还从这个模板中获得了两种方法：构造函数法和handle()方法。使用构造函数法可以将数据附加到任务中，handle()方法则是任务逻辑归属的地方(也是用来引入依赖的方法签名)。
+    特性和接口为类提供了加入队列以及与其进行互动的功能。Queueable允许我们指定Laravel如何将任务推送到队列中；InteractsWithQueue允许每个任务在处理过程中控制其与队列的关系，包括删除队列或重新排队；SerializesModels为任务提供序列化和反序列化Eloquent模型的能力。
+##### 序列化模型
+    SerializesModels特性使任务能够对引入的模型进行序列化，以便handle()方法可以访问它们。然而，因为可靠地系列化整个Eloquent对象很难，所以该特性可以确保在将任务推送到队列时，任何附加的Eloquent对象的主键都可以被序列化。当任务被反序列化处理时，该特性通过其主键从数据库中提取新的Eloquent模型。这意味着，当任务运行时，会显示这个模型的新实例，而不是在其队列中排队时的状态。
+    下面来编写样本类的方法，如示例16-2所示。
+###### 示例16-2 任务实例
+```
+    ...
+    use App\ReportGenerator;
+    use Illuminate\Log\Writer as Logger;
+
+    class CrunchReports implements ShouldQueue
+    {
+        use InteractsWithQueue,SerializesModels;
+
+        protected $user;
+
+        public function __construct($user)
+        {
+            $this->user = $user;
+        }
+
+        public function handle(ReportGenerator $generator,Logger $logger)
+        {
+            $generator->generateReportForUser($this->user);
+            $logger->info("Generated reports.");
+        }
+    }
+```
+    我们期待在创建该任务时引入User实例，然后在处理该实例时输出ReportGenerator类和一个Logger(Laravel提供的)。Laravel会读取这两种类型提示，并自动引入这些依赖。
+##### 将任务推送至队列
+    有两种主要方法可用于将任务推送至队列：全局dispatch()助手和DispatchesJobs trait提供的方法，它在每个控制器中是默认导入的。
+    将每一个被创建的任务实例传递给构造函数，可以附加上其他必要的数据，并将其传递给dispatch()方法(见示例16-3)。
+###### 示例16-3 Dispatching jobs
+
+
+SaaS:
+首页数据统计
+
+会员列表页
+
+会员详情页：
+    写跟进记录时，使用富文本框保存图片的情况，字数就无法控制。建议拆分为富文本框和图片上传，以便给图片加水印(如果有需要的话)；
+    跟进记录记录会员id、员工id、内容、图片、跟进时间。需要增加其他信息以便知晓跟进时，会员是个什么状态。
+    会员资料展示最新跟进记录

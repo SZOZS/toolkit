@@ -9,7 +9,7 @@
     Laravel的文件管理器定义位于config/filesystems.php中。每个链接都被称作"磁盘"，示例14-1列出了Laravel自带的、可用的磁盘。
 
 ###### 示例14-1默认可用的存储磁盘
-```
+```php
     ...
     "disks"=>[
         "local"=>[
@@ -33,19 +33,15 @@
 
 ##### storage_path()助手
     示例14-1中用到的storage_path()助手链接了Laravel中已配置的存储目录storage/。任何传入storage_path()的内容都会被添加到目录名的末尾，所以storage_path("public")会返回字符串storage/public。
-
     local磁盘与本地存储系统相连，并假设它将与存储路径的app目录，也就是storage/app，进行交互。
-
     public磁盘也是一种本地磁盘(尽管可以根据需要进行更改)，它适用于应用程序的任何文件。该磁盘默认位于storage/app/public目录下，如果想要将这个目录用于向公共磁盘提供文件，则需要在public/directory中添加一个符号链接(symlink)。Laravel提供了一行完成此操作的Artisan命令，如下所示。
-
     #映射 publi/storage,从storage/app/public中提供文件
     php artisan storage:link
-
     s3磁盘展示了Laravel怎样链接基于云端的文件存储系统。如果曾经链接过S3或者其他的云端存储提供商，你应该对这个只是点很熟悉：传入密钥、密码，以及一些定义正在使用的"文件夹"的信息，也就是S3的区域和存储桶。
 
 #### 使用存储facade
     可以在config/filesystem.php中设置默认磁盘，在调用Storage facade而不指定磁盘时就会使用默认磁盘。在facade中调用dick("dickname")可以指定一个磁盘，代码如下。
-```
+```php
     Storage::disk("s3")->get("file.jpg");
 ```
     每个文件系统都提供了下列方法。
@@ -74,7 +70,7 @@
 
 ###### 示例14-2添加额外的Flysystem提供商
     // 某些服务提供商
-```
+```php
     public function boot(){
         Storage::extend("dropbox",function($app,$config){
             $client = new DropboxClient(
@@ -89,7 +85,7 @@
     Storage facade 中最常见的一个应用就是从用户那里接受文件上传。下面通过实例14-3来看看常见的工作流程。
 
 ###### 常见的文件上传流程
-```
+```php
     ···
     class DogsController{
         public function updatePicture(Request $request,Dog $dog){
@@ -105,7 +101,7 @@
     在config/filesystem.php中已经存储了证书的情况下，如果想要将同样的文件上传到S3，则只需要调整示例14-3来调用Storage::disk("s3")->put(),这样就可以将文件上传到S3.我们来看一个更复杂的例子，如示例14-4所示。
 
 ###### 示例14-4使用Intervention进行更复杂的文件上传
-```
+```php
     ···
     class DogsController{
         public function updatePicture(Request $request,Dog $dog){
@@ -134,16 +130,19 @@
     使用会话facade是最常见的访问会话的方式，如下所示。
         session()->get("user_id");
     也可以在给定的Illuminate响应对象上使用session()方法，如eg14-5所示。
+
 ###### eg14-5 在响应对象上使用session()方法
     Route::get("dashboard",function(Request $request){
         $request->session()->get("user_id");
     });
     或者也可以注入一个Illumination\Session\Store实例，如eg14-6。
+
 ###### eg14-6 为会话注入支持类
     Route::get("dashboard",function(Illuminate\Session\Store $session){
         return $session->get("user_id");
     });
     最后可以使用全局session()助手。使用它时不添加任何参数便可以得到一个会话实例，可以通过单字符串参数从会话中“获取”数据，或者通过一个数组将数据“放入”会话中，如eg14-7
+
 ###### eg14-7 使用全局session()帮手
     // get
     $value = session()->get("key");
@@ -152,6 +151,7 @@
     session()->put("key","value");
     session(["key","value"]);
     如果刚开始使用Laravel不清楚应该使用哪一种方法，那么推荐使用全局助手。
+
 #### 会话实例的可用方法
     会话中最常见的俩个方法就是get()和put()，首先来看看每一个方法以及它们的参数，如下所示。
     session()->get($key,$fallbackValue)
@@ -191,6 +191,7 @@
     pull()和get()类似,不同在于pull()获取值之后删除该值。
     session()->regenerate()
     这个方法并不常见，用于重新生成会话ID。
+
 #### 闪存会话存储
     我们还有是哪个方法没有讲解，这三个方法都用于处理叫做"闪存"的会话存储。
     会话存储中非常常见的模式，是设置一个只能用于下一页加载的值。比如可能想要存储如"成功更新帖子"这样的信息。可以手动获取该消息，然后在下一次加载是擦除它。但是如果经常使用该模式，则可能造成很多浪费。若输入闪存会话存储，键(key)预计智能持续一个页面请求。
@@ -199,18 +200,22 @@
     flash()将下一个界面请求提供的值设置为会话的键值。
     session()->reflash()和session()->keep($key)
     如果需要前一个界面的flash()闪存数据依附于多个请求，则可以使用reflash()来为下一个请求存储全部闪存内容或者使用keep($key)为下一个请求存储单个闪存值。keep()也可以接受一个键值数组从而重新保存闪存数据。
+
 #### 高速缓存器cache
     cache的结构与会话非常类似。如果提供一个键值，那么Laravel会保存该值。二者最大的不同在于，高速缓存中的数据是为每个应用缓存的，而会话是为每个用户缓存的。也就是说，在进行存储大量的数据库结果，API调用或者其他慢查询时更常使用cache。
     cache的配置设置位于config/cache.php中。和会话一样，可以为任何驱动器进行特定的配置，也可以指定默认驱动。Laravel默认使用file高速缓存驱动器，也可以使用Memcached、Redis、API数据库或者编写自己的高速缓存驱动器。可以通过查看缓存文档（https://laravel.com/docs/master/cache）了解驱动程序所需的特定依赖项和设置。
+
 #### 访问高速缓存
     跟会话一样，访问高速缓存器也有一些不同的方法。可以使用facade，如下所示。
     $users = Cache::get("users");
     可以从容器中获得一个实例，如eg14-8
+
 ###### eg14-8 注入一个高速缓存实例
     Route::get("users",function(Illuminate\Contracts\Cache\Repository $cache){
         return $cache->get("users");
     })
     也可以使用全局cache()助手(Laravel5.3的新特性),如eg14-9。
+
 ###### eg14-9 使用全局cache()助手
     // 从cache中获取
     $users = cache("key","default value");
@@ -219,6 +224,7 @@
     $users = cache(["key"=>"value"],$minutes);
     $users = cache()->put("key","value",$minutes);
     如果刚开始使用Laravel，不清楚应该使用哪一种办法，那么推荐使用全局助手。
+
 #### Cache实例中可用的方法
     来看看在cache实例中可以使用的方法，如下所示。
     cache()->get($key,$fallbackValue)和cache()->put($key,$fallbackValue)
@@ -249,13 +255,16 @@
     increment()和decrement()方法允许在缓存中增加或者减少整数型。如果给定的键中不含值，则该值会被当做0；如果通过第二个参数指定增加或者减少的值，该方法会根据指定的操作加1或者减1。
     cache()->forget($key) 和 cache()->flush()
     forget()与会话的forget()方法类似:首先传入一个键，然后它会删除对应的值。flush()会删除所有的缓存。
+
 #### Cookie
     你可能希望cookie也和会话、缓存一样。cookie同样可以使用facade和全局助手里面的方法，也可以以同样的方法获取设定值。
     但是因为cookie本身就是附加在请求和响应上的，所以与cookie的交互方式有所不同。接下来看看为什么不同。
+
 #### Laravel中的cookie
     在Laravel中，cookie可以存在于三个地方。首先是在请求中，也就是在访问界面时，用户会获得一个cookie。可以通过Cookie facade读取该cookie，也可以从请求对象中读取。
     其次，cookie也可以发出相应，也就是说响应会指示用户的浏览器保存cookie以便将来访问。也可以在返回cookie之前，将它添加到响应对象中。
     最后，cookie可以组成队列。如果使用Cookie facade来设置cookie，则可以将其放入"CookieJar"队列中，然后cookie将会被移除并通过AddQueuedCookiesToResponse中间件添加到响应对象中。
+
 #### 访问cookie工具
     可以在三个地方获取和设置cookie:Cookie facade、cookie()全局助手、以及请求和响应对象。
     Cookie facade
@@ -277,6 +286,7 @@
     $httpOnly表明了cookie是否只能通过HTTP协议访问
     Cookie::make()
     返回一个Sysfony\Component\HttpFoundation\Cookie实例。
+
 ##### cookie的默认设置
     Cookie facade 实例使用CookieJar从会话配置中读取默认设置。所以如果要在config/session.php中为会话cookie改变任何配置值，同样的默认设置也会被应用到用Cookie facade创建的所有cookie中。
     Cookie::queue(Cookie//...params)
@@ -284,34 +294,44 @@
     如果需要，也可以将创建的cookie传入Cookie::queun()中。
     下面是一个在Laravel中将cookie添加到响应的简单示例。
     Cookie::queue("dismissed-popup",true,15);
+
 ##### 将没有设置的cookie进行排队
     cookie只能作为响应的一部分返回。所以如果将cookie排队到Cookie facade中,响应便不能正面返回————例如使用PHP的exit()方法或某些操作停止脚本的执行，那么cookie将不会被设置。
+
 ##### cookie()全局助手
     如果不适用参数调用cookie()全局助手，那么它将会返回一个CookieJar实例。然而Cookie facade 中最方便的两个方法has()和get()，只存在于facade而不包含CookieJar。因此在这种情况下，全局助手实际上比其他选项更有用。
     cookie()全局助手的一个重要任务是创建一个cookie。如果将参数传入cookie()，它们会被直接传给Cookie::make(),所以这是创建cookie最快的方法，如下所示。
     $cookie = cookie("dismissed-popup",true,15)
+
 ##### 注入一个实例
     也可以在应用程序的任意位置注入一个Illuminate\Cookie\CookieJar实例，但是还会遇到以下提到的限制。
+
 ##### 请求和响应对象的cookie
     由于cookie被设置为响应的一部分并且作为请求的一部分被传入，这些Illuminate对象就会位于它实际应该存在的位置。Cookie facade的get()、has()和queun()方法只是与请求和响应对象交互的代理。
     所以与cookie交互的最简单方法就是从请求中获取cookie，然后将它们设置到响应中。
+
 ##### 从请求对象中读取cookie
     一旦获得一个请求对象的副本————如果不知道怎样获取一个请求对象，可以尝试使用app("request")————便可以使用请求对象的cookie()方法来读取它的cookie,如eg14-10。
+
 ###### eg14-10 从请求对象中读取一个cookie
     Route::get("dashboard",function(Illuminate\Http\Request $request){
         $userDismissedPopup = $request->cookie("dismissed-popup",false);
     });
     正如这个示例一样，cookie()方法包含两个参数：cookie名称和可选参数回调值。
+
 ##### 在响应对象中设置cookie
     当响应对象可用的时候，可以使用cookie()方法(或者Laravel5.3之前版本的withCookie()方法)讲一个cookie添加到响应中，如eg14-11
+
 ###### eg14-11 在响应对象中设置cookie
     Route::get("dashboard",function(){
         $cookie = cookie("saw-dashboard",true);
         return Response::view("dashboard")->cookie($cookie);
     });
     如果刚开始使用Laravel,不太清楚应该使用哪个选项，那么推荐在请求和响应对象中设置cookie。虽然这样工作量会大一点，但是如果以后的开发者不了解CookieJar队列，这样的设置就可以节省很多时间。
+
 #### 基于Laravel Scout全文搜索
     Laravel Scout是一个独立的包，可以将它引入Laravel应用来为Eloquent模型添加全文搜索。Scout可以很容易地搜索Eloquent模型的内容，它随Algolia和Elasticsearch驱动程序一起提供，但也有其他服务提供商提供了社区版的软件包。这里假设读者使用的是Algolia。
+
 ##### 安装Scout
     首先从Laravel5.3以上版本的应用中获取软件包，如下所示。
     composer require laravel/scout
@@ -319,10 +339,12 @@
     为了配置Scout,需要先运行php artisan vendor:publish命令，然后将Algolia证书添加到config/scout.php中。
     最后安装Algolia SDK，如下所示。
     composer require algolia/algoliasearch-client-php
+
 ##### 标记索引模型
     在模型中(这里用Review模型作为示例)导入Laravel\Scout\Searchable特性。
     可以定义toSerachableArray()方法(默认为镜像toArray())和搜索的属性，然后使用searchavleAs()方法(默认是表名)定义模型的索引名称。
     Scout在标记的模型上订阅了create/delete/update事件。在创建更新或者删除任意行时，Scout会将这些修改同步到Algolia中。它既能使更新同步更改，也可以在Scout配置为使用队列是对排队进行更新。
+
 ##### 索引检索
     Scout的语法非常简单。例如检索包含词语Llew的Review,代码如下所示。
     Review::search("Llew")->get();
@@ -334,15 +356,18 @@
     Review::search("Llew")->where("account_id",2)->get();
     我们会检索出什么内容呢？结果是从数据库中获取的一个Eloquent模型的集合。Algolia中存储的Id返回一个匹配的Id列表,然后Scout从数据库中获取记录并将它们作为Eloquent对象返回。
     这里并没有完全用到复杂的SQL WHERE命令，但就像在代码示例中看到的那样，它为比较检索提供了一个基本框架。
+
 ##### 队列和Scout
     到现在为止，应用将在修改数据库记录的每个请求时向Algolia发出HTTP请求。这样可以快速减缓应用程序进程。这就是Scout可以轻松将其所有动作推送到队列中的原因。
     在config/scout.php中，将queue设为true就可以将这些更新设置为异步索引。全文本索引目前会保持"最终一致性"，也就是说数据库记录将立即接收到更新，并且搜索索引的更新将会尽可能快地按照队列允许的速度进行排队和更新。
+
 ##### 执行无索引操作
     如果想要这行一系列操作同时又不希望在响应中触发索引，那么可以在模型的withoutSyncingToSearch()方法中进行封装操作，代码如下。
     Review::withoutSyncingToSearch(function(){
         // 如添加一些评论
         factory(Review::class,10)->create();
     });
+
 ##### 通过代码手动触发索引
     如果希望在模型中手动触发索引，则可以在应用中使用代码或者通过命令行触发。
     在使用代码手动触发索引时，需要将searchable()添加到任意Eloquent查询的末尾，然后它将会为该查询里的所有记录添加索引。
@@ -352,19 +377,24 @@
     $user->reviews()->searchable();
     如果想要取消查询链中记录的索引，可以使用unsearchable(),如下所示。
     Review::where("sucky",true)->unsearchable();
+
 ##### 利用CLI手动触发索引
     还可以通过Artisan命令触发索引，如下所示。
     php artisan scout:import App\\Review
     该命令会将Review模型分块，并为这些块添加索引。
+
 #### 测试
     测试大多数特性与在测试中使用它们一样简单，不需要模拟或者存根，默认配置已经有效————例如查看phpunit xml 可以看到会话驱动和缓存驱动已经被设置为适合测试的值了。
     但是在尝试测试所有这些方法之前，应该了解一些简便的方法。
+
 #### 文件存储
     测试文件上传可能有一点麻烦，可以按照下面的步骤进行操作。
+
 ##### 上传假文件
     首先通过eg14-12来看看怎样在系统测试中手动创建一个sysfonyUploadedFile对象。注意，假设我们已经创建了storage/tests目录，存放用于测试的for-tests.jpg文件。
+
 ###### eg14-12 为测试创建一个假的UploadFile
-```
+```php
     public function test_file_should_be_stored(){
         $path=storage_path("/tests/for-tests.jpg");
         $file=new UploadFile(
@@ -380,11 +410,13 @@
     }
 ```
     我们已经创建了一个参照测试文件的UploadFile实例，现在可以用它来测试路由。
+
 ##### 返回假文件
     如果希望路由测试真实的文件，最好的办法就是该文件真的存在。假设每个用户都必须拥有个人资料图片。
     首先，设置模型工厂供用户使用Faker制作图片的副本，如eg14-13
+
 ###### eg14-13 通过Faker返回假文件
-```
+```php
     $factory->define(User::class,function(Faker\Generator $faker){
         return [
             "picture"=>$faker->file(
@@ -397,8 +429,9 @@
     });
 ```
     Faker的file()方法从源目录中随机选取一个文件，将它复制到目标目录，然后返回文件名。我们只需要从storage/tests目录中随机选择一个文件将它复制到storage/app目录下，然后将它的文件名设置为User的picture属性即可。这样我们便可以在测试路由时使用这个包含图片的User，如eg14-14。
+
 ###### eg14-14
-```
+```php
     public function test_user_profile_picture_echoes_correctly(){
         $user = factory(User::class)->create();
         $this->visit("users/{$user-id}");
@@ -406,6 +439,7 @@
     }
 ```
     当然在打赌多数情况下，甚至都不需要复制文件，只需要生成一个随机字符串。但是如果路由需要检查文件的存在或对文件执行某些操作，最好还是选择复制文件的方式。
+
 ##### 会话
     如果需要对会话中设置的某些内容进行断言，则可以使用Laravel为每个测试提供一些便利方法。所以这些方法都可以在测试的$this对象中使用，如下所示。
     assertSessionHas($key,$value=null)
@@ -437,16 +471,20 @@
     这里可以将之前界面的输入闪存到会话中，如果想要断言输入被正确闪存，如下所示。
     $this->post("test-route",["failing"=>"data"]);
     $this->assertHasOldinput();
+
 #### 高速缓存
     缓存的测试并没有什么特别，直接测试即可。
     Cache::put("key","value",15);
     $this->assertEquals("value",Cache::get("key"));
     在测试环境中，Laravel默认使用"数组"缓存驱动器，将缓存值存在内容中。
+
 #### cookie
     如果在系统测试中测试路由之前需要设置cookie，那么可以手动将cookie作为一个参数传入call()方法。可以查阅第12章学习更多的内容。
+
 ##### 在测试期间将cookie从加密中排除
     如果将cookie从Laraval的cookie加密中间件移除，那么它们在测试过程中就不会工作。这里可以在EncryptCookies中间件中暂停使用该cookie。
-```
+
+```php
     use Illuminate\Cookie\Middleware\EncryptCookies;
     ...
     $this->app->resolving(
@@ -458,8 +496,9 @@
 ```
     // ......运行测试
     这意味着可以设置和检索一个像eg14-5这样的cookie
+
 ###### eg14-5 为cookie运行单元设置
-```
+```php
     public function test_cookie(){
         $this->app->resolving(EncryptCookies::class,function($object){
             $object->disableFor("my-cookie");
@@ -469,8 +508,9 @@
     }
 ```
     如果不想停用加密，则可以像eg14-16一样为cookie设置加密值。
+
 ###### eg14-6 在设置前手动加密cookie
-```
+```php
     use Illuminate\Contracts\Encryption\Encrypter;
     ...
     public function test_cookie(){
@@ -488,21 +528,26 @@
     $this->visit("cookie-setting-route");
     $this->seeCookie("cookie-name");
     或者使用seePlainCookie()来测试，然后断言该cookie没有被加密。
+
 #### 本章小结
     Laravel为许多常见的存储操作提供了简单的接口:文件系统、访问会话、cookie缓存和检索。无论使用的是哪一个提供商，每一个API都是一样的，Laravel允许多个"驱动程序"提供相同的公共接口，这使得根据环境来切换所提供程序，或者根据应用程序的需求变化而变化更简单。
 
 ### 第15章 邮件和通知
     通过电子邮件、Slack、SMS或者其他通知系统来发送应用程序的用户通知，这是一个十分常见但却复杂到令人惊讶的要求。Laravel的邮件和通知功能提供了一个统一的API，它可以抽象出任何需要格外注意的特别的系统提供商。就像第14章中提到的，我们需要编写代码，然后在配置的时候选择使用哪个系统来发送邮件或通知。
+
 #### 邮件
     Laravel的邮件功能在SwiftMailer(http:://swiftmailer.org/)顶部的一个便利层，除此之外，Laravel中也含有Mailgun、Mandrill、Sparkpost、SES、SMTP、PHP邮件和Sendmail驱动程序。
     对于所有的云服务器来说，我们可以在config.service.php中设置自己的身份验证信息。但是，如果仔细观察，就会发现其中已经包含了一些关键字，并且在config/mail.php中，可以使用如MAIL_DRIVER和MAILGUN_SECRET一样的变量在.env中自定义应用的邮件功能。
+
 #### 基于云的API驱动程序依赖关系
     如果正在使用基于云的API驱动程序，则需要使用Composer将Guzzie插入。运行以下命令可以实现。
     composer require guzzlehttp/guzzle:"~5.3|~6.0"
     如果使用SES驱动程序，则需要运行以下命令。
     composer require aws/aws-sdk-php:3.0
+
 #### "classic"邮件 ================================================= 434
     Laravel中有两种不同的用于发送邮件的语法：class（经典）语法和mailable（可邮寄）语法。mailable是Laravel5.3版本之后的首选语法，因此我们将在本书中重点介绍次语法。对于使用Laravel5.1或Laravel5.2版本的用户来说，我们会大致介绍一下classic语法是如何工作的，如示例15-1所示。
+
 ###### 实例15-1 基本“classic”的邮件语法
     Mail::send(
         "emails.assignment",
@@ -517,13 +562,15 @@
     第二个参数是要传递给视图的数据数组。
     第三个参数是一个闭包，我们可以在这个比包中定义如何发送邮件，在哪发送邮件，以及发送人、收件人、抄送、密送、主体及任何其他的元数据。需要确保在闭包中使用想要访问的变量，并且要注意这个闭包会传递一个名为$m的参数，这是一个消息对象。
     可以查看一些旧的文档来了解classic邮件语法。
+
 #### 基本“mailable”邮件
     Laravel5.3版本引入了一种新的邮件语法，叫做mailable邮件语法。它和classic邮件语法的工作原理相同，不同的是，classic语法在一个闭包中定义邮件信息，而mailable语法可以创建一个特定的PHP类用来表示每个邮件。
     通过使用make：mail Artisan命令来说实现mailable语法的代码如下。
     php artisan make:mail Assignment
     示例15-2对上述PHP类进行了详细描述。
+
 ###### 示例15-2 一个自动生成的使用mailable语法的PHP类
-```
+```php
     <?php
     namespace App\Mail;
     use Illuminate\Bus\Queueable;
@@ -556,11 +603,14 @@
         }
     }
 ```
+
     这个类看起来可能很熟悉————它和job几乎一模一样。这个类甚至为邮件排队引入了Queueable trait和SerializesModels trait。因此，任何传递给构造函数的优秀的模型都将被正确序列化。
     那么这个类是如何工作的呢？基于mailable的build()方法是用来定义视图、主题的，同时可以调整除发送内容外的其他想要调整的内容。构造函数可以传递所有数据以及mailable类的所有可用于模板的公共属性。
     示例15-3显示了我们如何为实例更新自动生成的mailable语法。
+
 ###### 示例15-3 mailable语法
-```
+
+```php
     <?php
     namespace App\Mail;
     use Illuminate\Bus\Queueable;
@@ -587,38 +637,52 @@
         }
     }
 ```
+
     示例15-4显示了如何发送mailable语法。
+
 ###### 示例15-4 发送mailable语法的方法
+
     // 简单发送
     Mail::to($user)->send(new Assignment($trainer,$trainee));
     // 含有抄送、密送等内容的发送
     Mail::to($user)->cc($user2)->bcc($user3)->send(new Assignment($trainer,$trainee));
     // 含有收集的发送
     Mail::to("me@app.com")->bcc(User::all())->send(new Assignment($trainer,$trainee))
+
 #### 邮件模板
+
     邮件模板与其他模板一样。它们可以扩展其他模板，使用分段、解析变量、包含条件或循环指令，并且可以实现普通Blade视图中能够实现的任何功能。
     示例15-5是为示例15-3补充的一个可行的mails.assignments模板。
+
 ###### 示例15-5 任务邮件示例
-```
+
+```php
     <!-- resources/views/emails/assignment.blade.php -->
     <p>Hey {{ $trainee->name }}!</p>
     <p>You have received a new training assignment from <b>{{ $trainer->name }}</b>.Check out your <a href="{{ route('training-dashboard') }}">training dashboard</a> now!</p>
 ```
+
     在示例15-3中，$trainer和$trainee都是mailable的公共属性，可用于模板。
     如果想要明确定义传递到模板的变量，可以将with()方法连接到build()调用中，如示例15-6所示。
+
 ###### 示例15-6 自定义模板变量 ================================================= 438
-```
+
+```php
     {
         return $this->subject("You have a new assignment!")->view("email.assignment")->with(["assignment"=>$this->event->name]);
     }
 ```
+
 ##### HTML与纯文本电子邮件
+
     到目前为止，我们已在build()调用堆栈中使用了view()方法，这是基于我们引用的模板会回传HTML的设想。如果想要传送一个纯文本版本，可以用text()方法来定义纯文本视图。
     public function build()
     {
         return $this->view("email.reminder")->text("emails.reminder_plain");
     }
+
 #### build()中可用的方法
+
     以下是一些可以在mailable的build()方法中自定义信息的方法。
     from($address,$name=null)
     设置“from”的名字和地址，表示作者。
@@ -638,9 +702,13 @@
             $swift->setReplyTo("noreply@email.com");
         })->view("emails.howdy");
     }
+
 #### 附加和内联图片
+
     示例15-8显示了向电子邮件中添加附加邮件或原始数据的两种方法。
+
 ###### 示例15-8 向mailables中附加文件或数据
+
     // 使用本地文件名添加文件
     public function build()
     {
@@ -663,6 +731,7 @@
             ->view("emails.whitepaper");
     }
     示例15-9显示了如何在邮件中直接嵌入图像
+
 ###### 示例15-9内联图像
     <!-- emails/image.blade.php --!>
     Here is an image:
@@ -671,26 +740,40 @@
     <img src=>>{{ $message->embedData(
         file_get_contents(storage_path("embed.jpg")),"embed.jpg"
     ) }}>
+
 #### 队列
+
     发送电子邮件是一项耗时的任务，可能会导致应用程序运行减慢，因此，通常将发送电子邮件的任务转移到后台队列中。事实上，Laravel有一套内置的工具可以使邮件排队更加容易，不必为每封邮件编写队列任务。
+
 ##### 配置队列
+
     此处提到的一切都以队列正确配置为前提。通过第16章可以了解到更多关于队列如何工作以及如何让队列在应用程序中运行的内容。
+
 ##### queue()
+
     让邮件对象排队而不是立即发送，只要简单地将要发送的对象传递到Mail::queue()中即可，而不是Mail::send()中。
     Mail::queue(new Assignment($trainer,$trainee));
+
 ##### later()
+
     Mail::later()和Mail::queue()的工作原理相同，但是它允许添加一个延时————既可以在几分钟内添加，也可以通过传递一个DateTime或Carbon示例来设置指定的时间————电子邮件会在这个时间从队列中拉取并发送。
     $when=Carbon::now()->addMinutes(30);
     Mail::later($when,new Assignment($trainer,$trainee));
+
 ##### 指定队列或链接
+
     对于queue()和later()来说，如果想要指定将邮件添加到哪一个队列或队列链接中，就需要对即将传递的对象使用onConnection()和onQueue()方法。
     $message=(new Assignment($trainer,$trainee))
     ->onConnection("sqs")
     ->onQueue("emails");
     Mail::to($user)->queue($message);
+
 #### 本地开发
+
     在实际生产环境中发送邮件没有任何问题。但是，如何对它们进行全测试呢？有三个主要工具可供参考:Laravel的日志驱动程序、名为Mailtrap的软件服务(SaaS)应用程序以及"universal to"配置选项。
+
 ##### 日志驱动程序
+
     Laravel提供了一个日志驱动程序，记录了我们试图发送到本地Laravel.log文件(默认情况下在storage/log中)的每一封电子邮件。
     如果想要使用这个日志，需要编辑.env并且设置MAIL_DRIVER来进行登录。现在打开或拖放storage/logs/laravel.log,从应用程序中发送一封电子邮件，可以看到如下所示内容。
     Message-Id:<04ee2e97289c68f0c919lf4b04fc0del@localhost>
@@ -702,7 +785,9 @@
     Content-Type:text/html;charset=utf-8
     Content-Transfer-Encoding:quoted-printable
     Welcom to our app!
+
 ##### Mailtrap.io
+
     Mailtrap(https://mailtrap.io)是一个在开发环境中捕捉和检查电子邮件的服务。通过SMTP将邮件发送到Mailtrap服务器，而不是直接发送给预期的收件人，无论这些电子邮件的地址是否在收件人区域，Mailtrap都会将它们全部捕捉到并提供一个基于网络的电子邮件客户端对其进行检查。
     设置Mailtrap需要先注册一个免费的Mailtrap账户，并且访问演示的基本信息版，从SMTP列中复制用户名和密码。
     编辑应用程序的.env文件并且将mail部分设置为以下值。
@@ -713,22 +798,28 @@
     MAIL_PASSWORD=your_password_from_mailtrap_here
     MAIL_ENCRYPTION=null
     现在，由应用程序发送的所有电子邮件都会在Mailtrap收件箱中显示出来。
+
 ##### Universal to ================================================= 445
+
     如果想要在首选的客户端中检查电子邮件，可以使用“universal to”配置设置来覆盖每条信息中的to字段。要进行此设置，需要在config/mail.php文件中添加一个“to”关键字，代码如下。
     “to”=>[
         "address"=>"matt@mattstauffer.co",
         "name"=>"Matt Testing My Application"
     ],
     需要注意的是，要实际设置一个像Mailgun或Sendmail一样的真正的电子邮件驱动程序，之后才能使用。
+
 #### 通知
+
     网络应用程序发送的大多数邮件具有以下目的：确实通知用户一个特定的动作已经发生或需要发生。由于用户的沟通倾向越来越多元化，因此我们通过Slack、SMS和其他途径收集到了越来越多的不同的包来进行通信。
     Laravel5.3版本引入了一个新的概念：通知。就好像邮件一样，通知是一个PHP类，代表我们想要发送给用户的单一通信内容。现在，来想象一下，假设我们正通知体能训练应用软件的用户，告诉他们软件中有一个新的锻炼项目。
     每个类都代表了给使用一个或多个通知频道的用户发送通知时需要的所有消息。单个通知具备发送电子邮件、通过Nexmo发送SMS、发送WebSocksts ping、向数据库添加记录、向Slack频道发送消息等诸多功能。
     创建通知的命令如下。
     php artisan make:notification WorkoutAvailable
     示例15-10显示了这个命令的返回情况。
+
 ###### 示例15-10 一个自动生成的通知类
-```
+
+```php
     <?php
     namespace App\Notifications;
     
@@ -769,12 +860,17 @@
         }
     }
 ```
+
     我们可以从以上的代码中学到一些知识。首先，要把相关数据传递到构造函数。其次，对于给定的用户，可以通过via()方法来定义应该使用哪一个通知频道($notifiable代表我们想要通知的系统中的实体，在大多数应用中，它表示一个用户，但并不总是)。最后，每个通知频道都有各自的方法，允许我们专门定义如何在该频道中发送通知。
+
 ##### 什么时候$notification不表示一个用户
+
     虽然最常见的通知目标是用户，但我们仍有可能通知其他实体。因为应用程序中有多个用户类型————因此，我们还可能想要通知“培训者”和“学员”，甚至可能想要通知某个“群组”，某个“公司”，或者某个“服务器”。
     若要实现上述目标，需要修改类的WorkoutAvailable示例。请参考示例15-11。
+
 ###### 示例15-11 WorkoutAvailable通知类
-```
+
+```php
     class WorkoutAvailable extends Notification
     {
         use Queueable;
@@ -801,52 +897,76 @@
         }
     }
 ```
+
 #### 为通知对象定义via()方法
+
     如示例15-11所示，我们要决定对于不同的通知以及通知对象，到底应该采用哪个通知频道。可以把所有的通知都当做邮件来发送，也可以把它们当做SMS来发送（见示例15-12）。
+
 ###### 示例15-12最简单可行的via()方法
+
     public function via($notifiable)
     {
         return "nexmo";
     }
     也可以让每一个用户选择一种偏好方法，并将其保存在User内部。
+
 ###### 示例15-13 每个用户自定义via()方法
+
     public function via($notifiable)
     {
         return $notifiable->preferred_notification_channel;
     }
     或者，参照示例15-11，为每一个通知对象创建一个允许复杂通知逻辑的方法。例如，可以在工作时间内利用某些频道通知用户，而在非工作时间采用别的频道。需要注意的是，via()是一个PHP类,因此我们可以通过它实现任何复杂逻辑。
+
 #### 发送通知
+
     有两种发送通知的方式：使用Notification facade,或在一个Eloquent类（类似于User类）中添加Notifiable特性。
+
 ##### 使用Notifiable trait发送通知
+
     任何导入Laravel\Notifications\Notifiable trait(默认情况下是App\User类)的模型都具有一个可传递通知的notify()方法，如示例15-14所示。
+
 ###### 示例 15-14 使用Notifiable trait 发送通知
-```
+
+```php
     use App\Notifications\WorkoutAvailable;
     ...
     $user->notify(new WorkoutAvailable($workout));
 ```
+
 ##### 使用Notification facade 发送通知
+
     Notification facade 发送通知是两种方法中较为“笨拙”的一种，因为我们要同时传递通知对象和通知，好处在于可以同时传递多个通知对象，如示例15-15所示。
+
 ###### 示例15-15 使用Notification facade 发送通知
-```
+
+```php
     use App\Notifications\WorkoutAvailable;
     ...
     Notification::send($users,new WorkoutAvailable($workout));
-``` 
+```
+
 #### 排队通知
+
     大多数通知驱动程序需要发送HTTP请求从而发送通知，这有可能会降低用户体验，因此我们将通知进行排队，从而提升用户体验。所有通知都会默认被导入Queuable triat，因此我们需要做的仅仅是在通知中添加一个implements ShouldQueue,Laravel便会立即把该通知移到队列中去。
     和其他所有的排队功能一样，需要保证队列都正确地设置配置，队列工作者也在运行中。
     如果想要延迟通知的传送，可以运行delay()方法。
-```
+
+```php
     $delayUntil = Carbon::now()->addMinutes(15);
     $user->notify((new WorkoutAvailable($workout))->delay($delayUntil));
 ```
+
 #### 开箱即用的通知类型
+
     开箱即用，即Laravel为电子邮件、数据库、广播、Nexmo SMS和Slack提供的通知驱动软件。下面我们简单介绍一下开箱即用，建议大家参考官方文档(https:/laravel.com/docs/notifications),以便全面深入理解。
     创建通知驱动软件非常容易，可以在Laravel Notification Channels网站(http://laravel-notification-channels.com)找到详细方法。
+
 ##### 电子邮件通知
+
     来看一下示例15-11中的电子邮件是如何创建的。
-```
+
+```php
     public function toMail($notifiable)
     {
         return (new MailMessage)
@@ -855,30 +975,40 @@
             ->line("Thank you for training with us!");
     }
 ```
+
     结果如图15-1所示，电子邮件通知系统将应用名放置于电子邮件的头部，也可以在config/app.php的name关键字中自定义应用程序的名称。
     这封电子邮件会自动发送给通知对象的email属性，我们也可以通过向一个名为routeNotificationForMail()的类添加方法来自定义上述操作，这个类会返回我们想要发送电子邮件通知的目标地址。
     电子邮件的主题是通过解析通知类名并转换成文字来设定的。因此，WorkoutAvailable通知将会具有Workout Available的默认主题。也可以通过将subject()方法连接到toMail()方法中的MailMessage上来自定义主题。
     如果想要修改模板，需要发布并编辑核心内容，方法如下。
-```
+
+```php
     php artisan vender::publish --tag=laravel-notifications
 ```
+
     也可以将默认模板的样式更改为“错误”消息，该消息使用不同的编程语言，并且将主按钮的颜色变为红色。只需在toMail()方法中的MailMessage调用链中添加一个error()方法调用即可实现。
+
 ##### 数据库通知
+
     可以通过使用数据库通知频道向数据库表发送通知。首先没使用php artisan notifications : table语句创建一个新表。然后，在通知中创建一个toDatabase()方法,改方法会针对通知返回一个数据数组，该数据数组以JSON格式编码存储到数据库表的数据列中。
     Notifiable trait会向导入的所有模型中都添加一个通知关系，这样就可以轻松地访问通知表中的记录了，如果使用数据库通知，则可以像下面这样进行操作。
-```
+
+```php
     User::first()->notifications->each(function($notification){
         // 完成某些功能
     });
 ```
+
     数据库通知频道也有一个表示通知是否“已读”的标记。可以试着只标记“未读”通知，代码如下。
-```
+
+```php
     User::first()->unreadNotifiacations->each(function($notification){
         // 完成某些功能
     });
 ```
+
     也可以将某个或所有的通知都标记为已读。
-```
+
+```php
     // 某个
     User::first()->notifications->each(function ($notification){
         if($condition){
@@ -888,25 +1018,39 @@
     // 所有
     User::first()->unreadNotifications->markAsRead();
 ```
+
 ##### 广播通知
+
     广播通知频道使用Laravel的事件广播功能(Echo)来发送通知。
     在通知上创建一个toBroadcast()方法并返回数据数组，如果应用程序正确配置为事件广播，则数据将在名为{notifiable}{id}的私有频道上广播。{id}就是通知对象的ID，{notifiable}是通知对象的完全限定类名称，其中“斜杠”可以用“句点”来代替————例如，ID为1的App\User的私有频道可以表示为App.User.1。
+
 ##### SMS通知
+
     SMS通知是通过Nexmo发送的，因此，如果想要发送SMS通知，则需要注册一个nexmo账户，然后遵循文件(https://laravel.com/docs/notifications)中的说明进行操作。与其他频道一样，我们需要设置一个toNexmo()方法然后自定义消息内容。
+
 ##### Skack通知
+
     slack通知频道支持自定义通知形式，甚至可以向通知中添加附件。和其他频道一样，我们需要设置一个toSlack()方法然后自定义消息内容。
+
 #### 测试
+
     下面介绍如何测试邮件和通知。
+
 #### 邮件
+
     Laravel中有俩种测试邮件的选项。如果使用传统邮件语法，建议使用由Adam Wathan为Tighten编写的MailThief(https://github.com/tightenco/mailthief)工具。一旦使用Composer将MailThief引入应用程序中，就可以在测试中使用MailThief::hijack(),使MailThief捕捉到所有对Mail facade或邮件发送人类的调用。
     然后，MailThief就能对发件人、收件人、抄送、密件抄送，甚至邮件的内容及附件做出断言。
     想要了解更多内容请参考Github，或在应用程序中进行验证。
-```
+
+```php
     composer require tightenco/mailthief --dev
 ```
+
     如果使用mailable，则有一个简单的语法可用于为发送的邮件编写所有断言(见实例15-16)。
+
 ###### 示例15-16 针对mailable编写断言
-```
+
+```php
     public function test_signup_triggers_welcome_email()
     {
         ...
@@ -916,10 +1060,14 @@
         // 也可以使用assertSentTo()方法直接测试收件人
     }
 ```
+
 #### 通知
+
     laravel提供了一组内置的断言来测试通知，见示例15-17。
+
 ###### 示例15-17 发送断言通知
-```
+
+```php
     public function test_new_signups_triggers_admin_notification()
     {
         ...
@@ -929,37 +1077,54 @@
         // 也可以使用assertNotSentTo()方法
     }
 ```
+
 #### 本章小结
+
     Laravel的邮件和通知功能为多种不同的通知系统提供了简单、一致的界面。Laravel的邮件系统使用“mailable”表示电子邮件的PHP类，为不同的邮件驱动程序提供了一致的语法。通知系统可以轻易实现构建单个通知的功能，该通知可以在多种不同媒体中传送————无论通过电子邮件、SMS，还是实际生活中的邮寄。
 
-
-
 ### 第16章 队列，任务，事件，广播及调度程序
+
     到目前为止，我们已经介绍了驱动网络应用程序中最常见的一些结构:数据库、邮件、文件系统等。这些在大多数应用程序和框架中都很常见。
     laravel还为一些不太常见的架构模式和应用程序结构提供了可用工具。在这一章中，我们将介绍Laravel中用于实现队列、队列任务、事件和WebSocket事件发布的工具。我们还将讨论Laravel的调度程序，调度程序的出现是cron逐渐淡出人们的视线。
+
 #### 队列
+
     要理解队列是什么，可以参考在银行中排队的场景。即使有很多行(队列)，但每一个队列中只有一个人在享受服务，每个人最终都将到达前端并享受服务。一些银行有严格的“先入先出”的原则，但在其他的一些银行中，并没有严格保障，保证不会有人在你前方某处插队。大体上来说，有的人可以插入队列并提前离开，或者成功地办理业务，然后离开。有的人甚至可能已经到达队列的前端但没有得到想要的服务，然后回到队列中再次等待办理。
     编程中的队列与上述场景是十分相似的。应用程序执行特定行为的大段代码作为“任务”被添加到队列中，然后通常作为“队列工作者”的其他独立的应用程序结构负责从队列中拉取一个任务并执行适当的行为。队列工作者可以删除任务，将它们延迟返回队列，或将其标记为处理成功的任务。
     Laravel可以通过使用Redis、beanstalkd、Amazon的SQS(简单队列服务)或数据库表单使得为队列提供服务变得容易。还可以选择sync驱动使任务在应用程序中正确运行但无需排队，否则任务的null驱动程序将被丢弃。以上两种情况用于本地开发或测试环境中。
+
 #### 为什么使用队列
+
     使用队列可以很轻松地从同步调用中删除昂贵或缓慢的进程。最常见的例子是发送邮件————这样做可能比较慢，而且我们不希望用户等待邮件发送来相应他们的操作。相反，触发“发送邮件”排队任务，可以让使用者继续做他们自己的事情。有时我们不只是希望节省用户的时间，也可能会有一个cron任务或webhook进程需要处理，我们不希望它从头到尾只运行一次(可能超时)，因此可以选择对这些翻个部分进行排队，并让队列工作者逐个对其进行处理。
     此外，如果有一些超出服务器处理范围的重大进程，则可以让多个队列工作者加快转发速度，比正常应用程序服务器独自完成队列工作更快。
+
 #### 基本队列配置
+
     像许多抽象了多个程序提供者的其他Laravel的功能一样，队列有自己的专用配置文件(config/queue.php)，允许设置多个驱动程序并定义默认的驱动程序。这也是存储SQS、Redis或beanstalkd身份验证信息的地方。
+
 ##### Laravel Forge上的简单beanstalkd队列
+
     我们尚未深入了解Laravel Forge(http://forge.laravel.com/),这是由Laravel的创始人Taylor Otwell提供的一项托管服务。我们创建的每个服务器都会自动配置beanstalkd,所以当访问任何站点的Forge控制台时，都可以直接进入“Queue Workers”标签，点击Start Worker，使用beanstalkd作为队列驱动程序。通过这种方式，我们可以保留所有默认设置，并且不需要进行其他操作。
+
 #### 队列任务
+
     还记得前面提到的银行排队的类比吗？在编程术语中，银行队列(行)中的每个人都是一项待办任务。这项任务可以任意改变，它可以只是一个字符串，一个数组，或者一个对象。在Laravel中，它是包含任务名称、数据有效载荷、到目前为止所操作的次数，以及其他一些简单元数据的系列信息。
     我们无需担心与Laravel互动。Laravel提供了一个名为Job的结构，它的目的是封装单个任务————可以命令应用程序执行的行为————并且允许将其添加到队列中或从队列中提取。还有一些简单的帮助程序，可以方便地对Artisan命令和邮件进行排队。
     下面来看一个具体示例：用户使用我们的SaaS应用程序改变其计划，我们想要返回关于整体利润的计算。
+
 ##### 创建任务
+
     和之前一样，Artisan命令如下
-```
+
+```php
     php artisan make:job CrunchReports
 ```
+
     参照示例16-1，查看运行结果。
+
 ###### 示例16-1 Laravel中任务的默认模板
-```
+
+```php
     <?php
     use Illuminate\Bus\Queueable;
     use Illuminate\Queue\SerializesModels;
@@ -983,14 +1148,19 @@
         }
     }
 ```
+
     可以看到，这个模板引入了Queueable、InteractsWithQueue和SerializesModels的特性，并实现了ShouldQueue接口。在Laravel5.3版本之前，这些功能是通过父类App\Jobs来实现的。
     我们还从这个模板中获得了两种方法：构造函数法和handle()方法。使用构造函数法可以将数据附加到任务中，handle()方法则是任务逻辑归属的地方(也是用来引入依赖的方法签名)。
     特性和接口为类提供了加入队列以及与其进行互动的功能。Queueable允许我们指定Laravel如何将任务推送到队列中；InteractsWithQueue允许每个任务在处理过程中控制其与队列的关系，包括删除队列或重新排队；SerializesModels为任务提供序列化和反序列化Eloquent模型的能力。
+
 ##### 序列化模型
+
     SerializesModels特性使任务能够对引入的模型进行序列化，以便handle()方法可以访问它们。然而，因为可靠地系列化整个Eloquent对象很难，所以该特性可以确保在将任务推送到队列时，任何附加的Eloquent对象的主键都可以被序列化。当任务被反序列化处理时，该特性通过其主键从数据库中提取新的Eloquent模型。这意味着，当任务运行时，会显示这个模型的新实例，而不是在其队列中排队时的状态。
     下面来编写样本类的方法，如示例16-2所示。
+
 ###### 示例16-2 任务实例
-```
+
+```php
     ...
     use App\ReportGenerator;
     use Illuminate\Log\Writer as Logger;
@@ -1013,19 +1183,422 @@
         }
     }
 ```
+
     我们期待在创建该任务时引入User实例，然后在处理该实例时输出ReportGenerator类和一个Logger(Laravel提供的)。Laravel会读取这两种类型提示，并自动引入这些依赖。
+
 ##### 将任务推送至队列
+
     有两种主要方法可用于将任务推送至队列：全局dispatch()助手和DispatchesJobs trait提供的方法，它在每个控制器中是默认导入的。
     将每一个被创建的任务实例传递给构造函数，可以附加上其他必要的数据，并将其传递给dispatch()方法(见示例16-3)。
+
 ###### 示例16-3 Dispatching jobs
 
+```php
+    // 在控制器中
+    public function index()
+    {
+        $user = auth()->user();
+        $this->dispatch(new \App\Jobs\CrunchReports($user));
+    }
+    // 在其他地方
+    dispatch(new \App\jobs\CrunchReports($user));
+```
 
-SaaS:
-首页数据统计
+    我们可以控制三种设置，以便精确地自定义如何分配任务：链接、队列和延迟。
+    自定义链接。如果同时进行多个队列链接，则可以通过在实例化的任务上运行onConnection()来自定义链接。
 
-会员列表页
+```php
+    dispatch((new DoThingJob)->onConnection("redis"));
+```
 
-会员详情页：
-    写跟进记录时，使用富文本框保存图片的情况，字数就无法控制。建议拆分为富文本框和图片上传，以便给图片加水印(如果有需要的话)；
-    跟进记录记录会员id、员工id、内容、图片、跟进时间。需要增加其他信息以便知晓跟进时，会员是个什么状态。
-    会员资料展示最新跟进记录
+    自定义队列。在队列服务器中，可以指定将某个任务推送到特定的命名队列中。例如，可以根据它们的重要性对队列进行区分，并将其命名为low或high。
+    可以使用onQueue()方法自定义正在推送任务的队列。
+
+```php
+    dispatch((new DoThingJob)->onQueue("high"));
+```
+
+    自定义延迟。可以使用delay()方法自定义队列工作人员在处理任务之前等待的时间，该方法接收一个表示任务延迟秒数的整数为参数。
+
+```php
+    // 向队列工作者释放工作之前，延迟一分钟
+    dispatch((new DoThingJog)->delay(60));
+```
+
+    注意，Amazon SQS不允许延迟超过15分钟。
+
+#### 运行队列工作者
+
+    那么什么是队列工作者，它又是如何工作的呢？在Laravel中，这是一个能够永久运行(直到手动停止)的Artisan命令，负责从队列中提取任务并运行它们。
+
+```php
+    php artisan queue:work
+```
+
+    该命令启动一个守护进程来“监听”队列，每次队列中有任务时，它都会拉去第一个任务，处理它，删除它，然后转到下一个任务。如果任何时候都没有任务，那么在重新检查是否有更多的任务之前，它会“休眠”一段可配置的时间。
+    我们可以定义一个任务在队列监听器停止之前能够运行多少秒（————timeout），没有任务的时候监听器应该“休眠”，多少秒（————sleep），在删除之前应该允许每个任务有多少次尝试（————tries），工作者应该监听哪个链接（queue：work后面的第一个参数），以及应该监听哪个队列（————queue=）。
+
+```php
+    php artisan queue:work redis --timeout=60 --sleep=15 --tries=3 --queue=high,medium
+```
+
+    还可以使用php artisan queue：work处理单个任务。
+
+#### 错误处理
+
+    那么处理任务时会出现什么问题呢？
+
+##### 处理异常
+
+    如果抛出异常，队列监听器会将该任务释放到队列中。该任务将被重新执行，直到它能被成功地完成或尝试了队列监听器允许的最多次数为止。
+
+##### 限制尝试次数
+
+    尝试的最多次数是由————tries开关传递到queue：listen或queue：work的Artisan命令定义的。
+
+##### 无限重试的危险
+
+    如果没有设置————tries,或者将其设置为0，则队列监听器将允许无限重试。这意味着，入股哦存在任务永远无法完成的情况————例如，如果它依赖于已被删除的推文————那么应用程序便会慢慢地停止工作，因为它要不断的重新尝试完成不完整的任务。
+    官方文档和Laravel Forge都显示，3为最大重试次数的默认值。所以，一旦发生混乱，便可以以此为参考进行调整。
+
+```php
+    php artisan queue:listen --tries=3
+```
+
+    如果想要在某个时刻检查一下尝试运行的次数，可以对任务本身使用attempts()方法,如示例16-4所示。
+
+###### 示例16-4 检查一项任务已经尝试运行了多少次
+
+```php
+    public function handle()
+    {
+        ...
+        if($this->attempts()>3){
+            //
+        }
+    }
+```
+
+##### 处理失败的任务
+
+    一旦尝试次数超过允许重试次数的上限，就被认为是“失败”的任务。在进行其他任务之前————即使只是想限制任务可以尝试的次数————需要创建“失败任务”数据库表。
+    使用Artisan命令可以创建迁移。
+
+```php
+    php artisan queue:failed-table
+    php artisan migrate
+```
+
+    任何超过允许尝试次数上限的任务都将被转存到哪里。对于失败的任务，可以进行以下处理。
+    首先，可以为任务本身定义一个fail()方法。该方法在任务失败时运行（参见示例16-5）。
+
+###### 示例16-5任务失败时运行的方法
+
+```php
+    ...
+    class CrunchReports implements ShouldQueue
+    {
+        ...
+        public function failed()
+        {
+        }
+    }
+```
+
+    接下来，可以为失败的任务注册一个全局处理程序。在应用程序引导中的某处————如果不知道在哪里，只需要将其放在AppServiceProvider的boot()方法中即可————将代码放在示例16-6的代码段中，定义监听器。
+
+###### 示例16-6注册一个全局处理程序来处理失败的任务
+
+```php
+    use Illuminate\Support\Facades\Queue;
+    ...
+    public function boot()
+    {
+        Queue::failing(function($connection,$job,$data){
+
+        });
+    }
+```
+
+    还有一套用于与失败的任务进行交互的Artisan工具。
+    queue:failed显示失败任务的列表。
+
+```php
+    php artisan queue:failed
+```
+
+    列表形式如下。
+
+```mysql
+    +----+------------+---------+----------------------+---------------------+
+    | ID | Connection | Queue   | Class                | Failed At           |
+    +----+------------+---------+----------------------+---------------------+
+    | 9  | database   | default | App\Jobs\AlwaysFails | 2016-01-26 03:42:55 |
+    +----+------------+---------+----------------------+---------------------+
+```
+
+    在列表中，我们可以捕获所有失败任务的ID，并用queue:retry重试。
+
+```php
+    php artisan queue:retry 9
+```
+
+    如果想重试所有的任务，请传递all
+
+```php
+    php artisan queue:retry all
+```
+
+    可以使用queue:forget删除单个失败任务。
+
+```php
+    php artsian queue:forget 5
+```
+
+    可以使用queue:flush删除所有失败任务。
+
+```php
+    php artisan queue:flush
+```
+
+#### 控制队列
+
+    有时候，在处理任务的过程中需要添加一些条件，这些条件可能会使任务重新启动，或者将任务永远删除。
+    要将任务返回到队列中，可以使用release()命令，见示例16-7。
+
+###### 示例16-7 将任务返回队列中
+
+```php
+    public function handel()
+    {
+        ...
+        if(condition){
+            $this->release($numberOfSecondsToDelayBeforeRetrying);
+        }
+    }
+```
+
+    如果想要在处理过程中删除某项任务，可以随时返回，见示例16-8，这是向队列发出的信号，任务应被适当的处理，不应该返回队列。
+
+###### 实例16-8删除任务
+
+```php
+    public function handle()
+    {
+        ...
+        if($jobShouldBeDeleted){
+            return;
+        }
+    }
+```
+
+#### 支持其它功能的队列
+
+    队列的主要用途是推送任务，同时也可以使用Mail::queue功能对邮件进行列队。可以在第15章关于queue()的内容中了解更多相关信息，也可以对Artisan命令进行排列，这些我们在第7章中介绍过。
+
+#### 事件
+
+    对于任务，调度代码通知应用程序执行CrunchReports或NotifyAdminOfNewSignup操作。
+    对于事件，调用代码通知应用程序发生了以下事情：usersubscribed、usersignedup或contactwasadded。事件是某事发生时的通知。
+    其中一些事件可能会被框架本身“解绑”。例如，Eloquent模型在保存、创建或删除时触发事件。也有些事件是由应用程序的代码手动触发的。
+    被解绑的事件不会再执行任何操作。但是，我们可以绑定事件监听器，其唯一目的是监听特定事件的广播并做出响应。任何事件都可以有零到多个事件监听器。
+    Laravel事件的结构类似于观察者或“pub/sub”模式。许多事件被触发到应用程序中。有些可能永远不会被监听，而另一些可能有十几个监听器。事件本身不知道这些情况，也不关心这些。
+
+#### 触发事件
+
+    触发事件的方法有三种。可以使用Event facade,引入Dispatcher，或使用event()全球助手。
+
+```php
+    Event::fire(new UserSubscribed($user,$plan));
+    // 或者
+    $dispatcher=app(Illuminate\Contracts\Events\Dispatcher);
+    $dispatcher->fire(new UserSubscribed($user,$plan));
+    // 或者
+    event(new UserSubscribed($user,$plan));
+```
+
+    如果有疑问，建议使用全局助手函数。
+    创建一个要触发的事件，可以使用make:event Artisan命令。
+
+```php
+    php artisan make:event UserSubscribed
+```
+
+    执行上述命令将会创建一个如示例16-9所示的文件。
+
+###### 示例16-9 Laravel事件的默认模板
+
+```php
+    <?php
+    namespace App\Event;
+
+    use Illuminate\Broadcasting\Channel;
+    use Illuminate\Queue\SerializesModels;
+    use Illuminate\Broadcasting\PrivateChannel;
+    use Illuminate\Broadcasting\PresenceChannel;
+    use Illuminate\Broadcasting\InteractsWithSockets;
+    use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+
+    class UserSubscribed
+    {
+        use InteractsWithSockets,SerializesModels;
+
+        public function __construct()
+        {
+
+        }
+
+        public function broadcastOn()
+        {
+            return new PrivateChannel(“channel-name”);
+        }
+    }
+```
+
+    通过以上代码可知，SerializesModels的工作方式和任务一样，允许接收Eloquent模型作为参数。InteractsWithSockets、Should Broadcast和broadcastOn()方法提供了使用WebSockets广播事件的后台功能，稍后将详细介绍。
+    这里没有handle()或fire()方法似乎很奇怪。但是请记住，此对象不是为了确定一个特定的动作，而是为了封装一些有用的数据。第一个数据是它的名称，UserSubscribed告诉我们发生了特定的事件(用户订阅)。其余的数据是我们传递给构造函数并与此实体关联的数据。
+    示例16-10显示了我们可能会对UserSubscribed事件执行的操作。
+
+###### 示例16-10 将数据引入事件
+
+```php
+    ...
+    class UserSubscribed
+    {
+        use InteractsWithSockets,SerializesModels;
+
+        public $user;
+        public $plan;
+        public function __construct($user,$plan)
+        {
+            $this->user=$user;
+            $this->plan=$plan;
+        }
+    }
+```
+
+    现在便可以使用一个对象恰当地表示发生的事件了————$event->user订阅了$event->plan计划。
+
+#### 监听事件
+
+    再有能力触发事件后，我们来看看如何监听事件。
+    首先，创建一个事件监听器。假设我们想要在每次有新用户订阅事件时通过电子邮件发送应用的所有者，代码如下。
+
+```php
+    php artisan make:listener EmailOwnerAboutSubscription --event=UserSubscribed
+```
+
+    执行代码，将得到示例16-11中的文件。
+
+###### 示例16-11 用于laravel事件监听的默认模板
+
+```php
+    <?php
+    namespace App\Listeners;
+
+    use App\Events\UserSubscribed;
+    use Illuminate\Queue\InteractsWithQueue;
+    use Illuminate\Contracts\Queue\ShouldQueue;
+
+    class EmailOwnerAboutSubscription
+    {
+        public function __construct()
+        {
+        }
+
+        public function handle(UserSubscribed $event)
+        {
+            
+        }
+    }
+```
+
+    也就是handle()方法所在的位置，也是操作发生的地方。该方法期望收到一个类似为UserSubscribed的事件并做出相应。
+    所以，我们要为上述方法发送一封电子邮件，见示例16-12。
+
+###### 示例16-12事件监听器实例
+
+```php
+    use Illuminate\Contracts\Mail\Mailer;
+    class EmailOwnerAboutSubscription
+    {
+        protected $mailer;
+
+        public function __construct(Mailer $mailer)
+        {
+            $this->mailer=$mailer;
+        }
+
+        public function handle(UserSubscription $event)
+        {
+            $this->mailer->send(
+                new OwnerSubscriptionEmail($event->user,$event->plan)
+            );
+        }
+    }
+```
+    非常好！还有最后一个任务：设置监听器来监听UserSubscription事件。我们将在EventServiceProvider类的$listen属性中设置它，见示例16-13。
+
+###### 示例16-13 将监听器绑定到EventServiceProvider中的事件
+```php
+    class EventServiceProvider extends ServiceProvider
+    {
+        protected $listen=[
+            \App\Events\UserSubscribed::class=>[
+                \App\Listeners\EmailOwnerAboutSubscription::class,
+            ],
+        ];
+    }
+```
+
+    可以看到，每个数据组的键是事件的类名，该值是一个监听器类名的数组。我们可以在Usersubscribed键下添加许多类名，它们会监听并相应每个Usersubscribed事件。
+
+##### 事件订阅者
+    还有一个结构可以用于定义事件极其监听器之间的关系。Laravel中有一个称为事件订阅者的概念，它是类的集合，其中包含一系列方法，这些方法可以作为单独的监听器用来处理特定的事件，而且还明确了哪个方法应该处理哪个事件，见示例16-14。
+
+###### 示例16-14事件订阅者
+```php
+    <?php
+    namespace App\Listeners;
+
+    class UserEventSubscriber
+    {
+        public function onUserSubscription($events)
+        {
+        }
+
+        public function onUserCancellation($events)
+        {
+        }
+
+        public function subscribe($events)
+        {
+            $events->listen(
+                \App\Events\UserSubscribed::class,
+                "App\Listeners\UserEventSubscriber@onUserSubscription"
+            );
+            $events->listen(
+                \App\Events\UserCancelled::class,
+                "App\Listeners\UserEventSubscriber@onUserCancellation"
+            );
+        }
+    }
+```
+    订阅者需要定义一个subscribe()方法，该方法传递一个事件调度器的实例，我们将使用它对时间及其监听器进行配对。但这种情况是该类特有的，不适用于所有类。大家可以将这种情况作为一个规律来记住，任何时候看到‘@’这样的标识，就知道类名在@的左边，而方法名在右边。
+    因此，在示例16-14中，我们定义了订阅者的onUserSubscription()方法，该方法将监听所有的UserSubscribed事件。
+    最后需要在App\Providers\EventServiceProvider中将订阅者的类名添加到$subscribe属性，如示例16-15所示。
+###### 示例16-15 注册事件订阅者
+```php
+    class EventServiceProvider extends ServiceProvider
+    {
+        ...
+        protected $subscribe=[
+            \App\Listeners\UserEventSubscriber::class
+        ];
+    }
+```
+#### 通过WebSocket广播事件及Laravel Echo
+    WebSocket(通常表示为WebSockets)是一种由Pusher推广的协议，它可以简化网络设备间的实时通信。WebSocket库打开了客户端和服务器之间的直接连接，不依靠HTTP请求传递的信息。WebSocket是后端工具，就像Gmail和Facebook中的聊天框一样。
+    WebSocket最适合处理pub/sub结构中传递的小数据————就像Laravel的事件一样。Laravel具有一套内置工具，可以轻松定义一个或多个应该广播到WebSocket服务器的事件。例如，将MessageWasReceived事件发布到某个用户或用户组的通知框中，消息会立刻在应用程序中出现。
+##### Laravel Echo
+    Laravel中还有一个更强大的工具，用于广播更复杂的事件。如果需要保存通知，或者使丰富的前端数据模型与Laravel的ying'yong
